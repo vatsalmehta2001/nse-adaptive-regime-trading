@@ -1,0 +1,435 @@
+# TensorTrade & Reinforcement Learning Configuration
+# Configuration for RL agents and trading environment
+
+# =============================================================================
+# RL Environment Configuration
+# =============================================================================
+environment:
+  # Environment type
+  env_type: "TradingEnv"
+  
+  # Observation settings
+  observation:
+    # Features to include in state space
+    features:
+      - "open"
+      - "high"
+      - "low"
+      - "close"
+      - "volume"
+      - "returns"
+      - "volatility"
+      - "rsi"
+      - "macd"
+      - "position"
+      - "unrealized_pnl"
+      - "cash_balance"
+      - "portfolio_value"
+    
+    # Lookback window for observations
+    window_size: 60  # Use last 60 time steps
+    
+    # Normalization
+    normalize: true
+    normalization_method: "minmax"  # or "zscore"
+  
+  # Action space
+  action:
+    type: "discrete"  # or "continuous"
+    
+    # Discrete actions
+    discrete_actions:
+      - "hold"     # 0: Do nothing
+      - "buy"      # 1: Buy (long position)
+      - "sell"     # 2: Sell (short/close position)
+    
+    # For continuous action space
+    continuous:
+      action_scheme: "managed-risk"
+      low: -1.0   # -1 = full sell/short
+      high: 1.0   # +1 = full buy/long
+  
+  # Reward function
+  reward:
+    type: "risk_adjusted_returns"  # or "simple", "sortino", "sharpe"
+    
+    # Risk-adjusted returns settings
+    risk_free_rate: 0.05  # 5% annual
+    
+    # Reward scaling
+    scale_rewards: true
+    reward_scaling_factor: 100
+    
+    # Additional reward components
+    penalty_for_trades: 0.001  # Discourage overtrading
+    reward_for_holding: 0.0
+  
+  # Episode settings
+  episode:
+    max_steps: 1000  # Maximum steps per episode
+    initial_balance: 100000  # Starting capital
+    max_allowed_loss: 0.5  # Stop episode at 50% loss
+  
+  # Transaction costs
+  costs:
+    commission: 0.0003  # 0.03%
+    slippage: 0.0001    # 0.01%
+    min_commission: 5   # Minimum commission per trade
+
+# =============================================================================
+# RL Algorithms Configuration
+# =============================================================================
+algorithms:
+  # Proximal Policy Optimization (PPO) - Recommended
+  ppo:
+    enabled: true
+    
+    # Hyperparameters
+    learning_rate: 0.0003
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99  # Discount factor
+    gae_lambda: 0.95
+    clip_range: 0.2
+    clip_range_vf: null
+    normalize_advantage: true
+    ent_coef: 0.01  # Entropy coefficient
+    vf_coef: 0.5    # Value function coefficient
+    max_grad_norm: 0.5
+    
+    # Network architecture
+    policy_kwargs:
+      net_arch:
+        pi: [256, 256]  # Policy network
+        vf: [256, 256]  # Value network
+      activation_fn: "tanh"
+  
+  # Advantage Actor-Critic (A2C)
+  a2c:
+    enabled: true
+    
+    learning_rate: 0.0007
+    n_steps: 5
+    gamma: 0.99
+    gae_lambda: 1.0
+    ent_coef: 0.01
+    vf_coef: 0.5
+    max_grad_norm: 0.5
+    normalize_advantage: false
+    
+    policy_kwargs:
+      net_arch:
+        pi: [256, 256]
+        vf: [256, 256]
+      activation_fn: "relu"
+  
+  # Deep Q-Network (DQN)
+  dqn:
+    enabled: false  # Only for discrete action spaces
+    
+    learning_rate: 0.0001
+    buffer_size: 100000
+    learning_starts: 1000
+    batch_size: 32
+    tau: 1.0
+    gamma: 0.99
+    train_freq: 4
+    gradient_steps: 1
+    target_update_interval: 10000
+    exploration_fraction: 0.1
+    exploration_initial_eps: 1.0
+    exploration_final_eps: 0.05
+    
+    policy_kwargs:
+      net_arch: [256, 256]
+      activation_fn: "relu"
+  
+  # Soft Actor-Critic (SAC) - For continuous actions
+  sac:
+    enabled: false
+    
+    learning_rate: 0.0003
+    buffer_size: 100000
+    learning_starts: 1000
+    batch_size: 256
+    tau: 0.005
+    gamma: 0.99
+    train_freq: 1
+    gradient_steps: 1
+    ent_coef: "auto"
+    target_update_interval: 1
+    
+    policy_kwargs:
+      net_arch: [256, 256]
+      activation_fn: "relu"
+
+# =============================================================================
+# Training Configuration
+# =============================================================================
+training:
+  # Training settings
+  total_timesteps: 1000000
+  
+  # Evaluation
+  eval_freq: 10000
+  n_eval_episodes: 10
+  eval_env: "separate"  # Use separate environment for evaluation
+  
+  # Callbacks
+  callbacks:
+    checkpoint:
+      enabled: true
+      save_freq: 50000
+      save_path: ${RL_MODELS_PATH}
+      name_prefix: "rl_model"
+    
+    tensorboard:
+      enabled: true
+      log_dir: ${RL_TENSORBOARD_LOG}
+    
+    early_stopping:
+      enabled: true
+      patience: 5
+      min_episodes: 100
+      threshold: 0.01  # Minimum improvement
+  
+  # Logging
+  verbose: 1
+  log_interval: 10
+  
+  # Multi-processing
+  n_envs: 4  # Parallel environments for training
+  
+  # Random seed
+  seed: 42
+
+# =============================================================================
+# Hyperparameter Optimization (Optional)
+# =============================================================================
+hyperparameter_tuning:
+  enabled: false
+  
+  # Optimization method
+  method: "optuna"  # or "grid_search", "random_search"
+  
+  # Optuna settings
+  optuna:
+    n_trials: 100
+    n_jobs: 1
+    sampler: "tpe"  # Tree-structured Parzen Estimator
+    pruner: "median"
+    
+    # Search space
+    search_space:
+      learning_rate:
+        type: "log_uniform"
+        low: 0.00001
+        high: 0.01
+      
+      gamma:
+        type: "uniform"
+        low: 0.9
+        high: 0.9999
+      
+      ent_coef:
+        type: "log_uniform"
+        low: 0.00001
+        high: 0.1
+      
+      clip_range:
+        type: "uniform"
+        low: 0.1
+        high: 0.4
+
+# =============================================================================
+# Model Selection & Ensemble
+# =============================================================================
+ensemble:
+  # Use ensemble of RL agents
+  enabled: false
+  
+  # Ensemble method
+  method: "voting"  # or "stacking", "weighted"
+  
+  # Models to ensemble
+  models:
+    - ppo
+    - a2c
+  
+  # Weights for weighted ensemble
+  weights:
+    ppo: 0.7
+    a2c: 0.3
+
+# =============================================================================
+# Regime-Adaptive Settings
+# =============================================================================
+regime_adaptation:
+  # Enable regime-specific RL agents
+  enabled: true
+  
+  # Train separate agents for different market regimes
+  regime_specific_agents:
+    bull_market:
+      model: "ppo"
+      config_overrides:
+        learning_rate: 0.0005
+        ent_coef: 0.005
+    
+    bear_market:
+      model: "a2c"
+      config_overrides:
+        learning_rate: 0.001
+        vf_coef: 0.7
+    
+    sideways_market:
+      model: "ppo"
+      config_overrides:
+        learning_rate: 0.0003
+        n_steps: 1024
+    
+    high_volatility:
+      model: "a2c"
+      config_overrides:
+        learning_rate: 0.0005
+        gamma: 0.95
+  
+  # Regime switching settings
+  regime_switch:
+    lookback_period: 20  # Days to determine regime
+    confidence_threshold: 0.7
+
+# =============================================================================
+# Experience Replay (for off-policy algorithms)
+# =============================================================================
+experience_replay:
+  # Replay buffer settings
+  buffer_size: 100000
+  prioritized_replay: false
+  
+  # Prioritized replay settings (if enabled)
+  prioritized:
+    alpha: 0.6
+    beta: 0.4
+    epsilon: 0.000001
+
+# =============================================================================
+# Curriculum Learning
+# =============================================================================
+curriculum_learning:
+  enabled: false
+  
+  # Progressive difficulty stages
+  stages:
+    - name: "easy"
+      duration: 100000  # timesteps
+      settings:
+        volatility: "low"
+        trend_strength: "strong"
+    
+    - name: "medium"
+      duration: 300000
+      settings:
+        volatility: "medium"
+        trend_strength: "medium"
+    
+    - name: "hard"
+      duration: 600000
+      settings:
+        volatility: "high"
+        trend_strength: "weak"
+
+# =============================================================================
+# Advanced RL Techniques
+# =============================================================================
+advanced:
+  # Recurrent policies (for LSTM/GRU)
+  recurrent:
+    enabled: false
+    lstm_hidden_size: 128
+    n_lstm_layers: 2
+  
+  # Attention mechanism
+  attention:
+    enabled: false
+    n_heads: 4
+    embed_dim: 128
+  
+  # Hindsight Experience Replay
+  her:
+    enabled: false
+  
+  # Inverse Reinforcement Learning
+  irl:
+    enabled: false
+
+# =============================================================================
+# Backtesting with Trained RL Agent
+# =============================================================================
+backtesting:
+  # Use trained model for backtesting
+  model_path: "${RL_MODELS_PATH}/best_model.zip"
+  
+  # Backtest period
+  start_date: "2024-01-01"
+  end_date: "2024-12-31"
+  
+  # Deterministic actions (no exploration)
+  deterministic: true
+  
+  # Metrics to track
+  metrics:
+    - "total_return"
+    - "sharpe_ratio"
+    - "max_drawdown"
+    - "win_rate"
+    - "profit_factor"
+    - "sortino_ratio"
+
+# =============================================================================
+# Visualization & Analysis
+# =============================================================================
+visualization:
+  # Plot training progress
+  plot_training: true
+  
+  # Plot episode rewards
+  plot_rewards: true
+  
+  # Analyze learned policy
+  policy_analysis:
+    enabled: true
+    save_path: "reports/rl_policy_analysis"
+  
+  # Generate trading signals visualization
+  signals_plot:
+    enabled: true
+    save_path: "reports/rl_signals"
+
+# =============================================================================
+# Deployment Settings
+# =============================================================================
+deployment:
+  # Model format for production
+  export_format: "onnx"  # or "torchscript"
+  
+  # Model versioning
+  version_control: true
+  model_registry: "mlflow"
+  
+  # Performance monitoring
+  monitor_performance: true
+  alert_on_degradation: true
+  performance_threshold: 0.8  # Alert if performance drops below 80% of training
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: INFO
+  log_training_progress: true
+  log_episode_rewards: true
+  log_actions: false  # Can be verbose
+  log_predictions: false
+

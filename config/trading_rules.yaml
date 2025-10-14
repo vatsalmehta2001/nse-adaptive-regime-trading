@@ -1,0 +1,505 @@
+# Trading Rules Configuration
+# Risk management rules, portfolio constraints, and trading logic
+
+# =============================================================================
+# Portfolio Configuration
+# =============================================================================
+portfolio:
+  # Initial capital
+  initial_capital: 1000000  # 10 lakh INR
+  
+  # Portfolio constraints
+  constraints:
+    min_cash_reserve: 0.05  # Keep 5% in cash
+    max_leverage: 1.0  # No leverage (1.0 = fully invested)
+    
+  # Position limits
+  position_limits:
+    max_positions: 20
+    min_position_value: 5000  # Minimum 5k per position
+    max_position_value: 200000  # Maximum 2L per position
+    max_position_pct: 0.20  # Max 20% in single position
+
+# =============================================================================
+# Universe Definition
+# =============================================================================
+universe:
+  # Primary trading universe
+  primary:
+    - RELIANCE
+    - TCS
+    - HDFCBANK
+    - INFY
+    - ICICIBANK
+    - HINDUNILVR
+    - ITC
+    - SBIN
+    - BHARTIARTL
+    - KOTAKBANK
+    - LT
+    - AXISBANK
+    - ASIANPAINT
+    - MARUTI
+    - SUNPHARMA
+    - TITAN
+    - BAJFINANCE
+    - HCLTECH
+    - ULTRACEMCO
+    - WIPRO
+    - NESTLEIND
+    - BAJAJFINSV
+    - ADANIPORTS
+    - TATASTEEL
+    - POWERGRID
+    - NTPC
+    - ONGC
+    - M&M
+    - TECHM
+    - DIVISLAB
+  
+  # Sector allocation
+  sectors:
+    financials:
+      max_allocation: 0.30
+      stocks:
+        - HDFCBANK
+        - ICICIBANK
+        - KOTAKBANK
+        - SBIN
+        - AXISBANK
+        - BAJFINANCE
+        - BAJAJFINSV
+    
+    information_technology:
+      max_allocation: 0.25
+      stocks:
+        - TCS
+        - INFY
+        - HCLTECH
+        - WIPRO
+        - TECHM
+    
+    energy:
+      max_allocation: 0.15
+      stocks:
+        - RELIANCE
+        - ONGC
+        - POWERGRID
+        - NTPC
+    
+    consumer_goods:
+      max_allocation: 0.20
+      stocks:
+        - HINDUNILVR
+        - ITC
+        - NESTLEIND
+        - TITAN
+        - ASIANPAINT
+    
+    automotive:
+      max_allocation: 0.10
+      stocks:
+        - MARUTI
+        - M&M
+        - TATAMOTORS
+  
+  # Excluded stocks (if any)
+  exclusions:
+    - EXAMPLE_EXCLUDED_STOCK
+
+# =============================================================================
+# Entry Rules
+# =============================================================================
+entry_rules:
+  # Minimum conditions for entry
+  minimum_conditions:
+    # Liquidity filters
+    min_avg_daily_volume: 100000  # Minimum average daily volume
+    min_avg_daily_value: 1000000  # Minimum 10L daily turnover
+    
+    # Price filters
+    min_price: 10  # Minimum stock price
+    max_price: 100000  # Maximum stock price
+    
+    # Volatility filters
+    min_volatility: 0.01  # Minimum 1% daily volatility
+    max_volatility: 0.10  # Maximum 10% daily volatility
+  
+  # Signal requirements
+  signal_requirements:
+    # Require multiple signal confirmations
+    min_signal_strength: 0.6  # Minimum 60% confidence
+    require_regime_confirmation: true
+    require_qlib_signal: true
+    require_rl_signal: false  # Optional RL confirmation
+  
+  # Timing rules
+  timing:
+    avoid_first_minutes: 15  # Avoid first 15 minutes after market open
+    avoid_last_minutes: 15  # Avoid last 15 minutes before close
+    
+    # Don't trade during high impact events
+    avoid_events:
+      - monetary_policy
+      - earnings_announcement
+      - results_declaration
+  
+  # Position sizing
+  position_sizing:
+    method: "risk_based"  # or "equal_weight", "volatility_weighted"
+    
+    risk_based:
+      risk_per_trade: 0.01  # 1% risk per trade
+      use_stop_loss_distance: true
+    
+    equal_weight:
+      weight: 0.05  # 5% per position
+    
+    volatility_weighted:
+      target_volatility: 0.02  # 2% portfolio volatility
+      lookback_days: 20
+
+# =============================================================================
+# Exit Rules
+# =============================================================================
+exit_rules:
+  # Stop loss rules
+  stop_loss:
+    enabled: true
+    type: "trailing"  # or "fixed", "volatility_based", "time_based"
+    
+    # Fixed stop loss
+    fixed:
+      percentage: 0.02  # 2% stop loss
+    
+    # Trailing stop loss
+    trailing:
+      percentage: 0.03  # 3% trailing stop
+      activation_profit: 0.01  # Activate after 1% profit
+      step_size: 0.005  # Trail by 0.5% steps
+    
+    # Volatility-based stop
+    volatility_based:
+      atr_multiplier: 2.0  # 2x ATR
+      lookback_period: 14
+    
+    # Time-based stop
+    time_based:
+      max_holding_period: 10  # days
+      exit_at_close: true
+  
+  # Take profit rules
+  take_profit:
+    enabled: true
+    
+    # Multiple targets
+    targets:
+      - level: 0.02  # 2% profit
+        action: "reduce"
+        reduce_by: 0.5  # Reduce by 50%
+      
+      - level: 0.05  # 5% profit
+        action: "close"  # Close entire position
+      
+      - level: 0.10  # 10% profit (stretch target)
+        action: "close"
+  
+  # Signal-based exits
+  signal_exits:
+    exit_on_signal_reversal: true
+    exit_on_regime_change: true
+    exit_on_weak_signal: true
+    weak_signal_threshold: 0.3
+  
+  # Time-based exits
+  time_based:
+    # End of day exit for intraday
+    eod_exit_for_mis: true
+    eod_exit_time: "15:20"
+    
+    # Maximum holding period
+    max_holding_period: 30  # days
+    
+    # Day of week exits (if needed)
+    exit_on_friday: false  # Close positions before weekend
+
+# =============================================================================
+# Risk Management Rules
+# =============================================================================
+risk_management:
+  # Portfolio-level risk
+  portfolio_risk:
+    # Value at Risk (VaR)
+    var:
+      enabled: true
+      confidence_level: 0.95
+      max_var: 0.02  # Max 2% daily VaR
+    
+    # Maximum drawdown
+    max_drawdown:
+      enabled: true
+      threshold: 0.15  # Stop trading at 15% drawdown
+      calculation_method: "peak_to_trough"
+    
+    # Daily loss limit
+    daily_loss_limit:
+      enabled: true
+      percentage: 0.03  # 3% of capital
+      action: "stop_trading"  # or "reduce_positions"
+  
+  # Position-level risk
+  position_risk:
+    # Concentration limits
+    max_position_size: 0.20  # 20% max per position
+    max_sector_exposure: 0.30  # 30% max per sector
+    
+    # Correlation limits
+    max_correlation: 0.7  # Avoid highly correlated positions
+    check_pairwise_correlation: true
+    
+    # Beta limits
+    max_position_beta: 2.0
+    target_portfolio_beta: 1.0
+    max_portfolio_beta: 1.5
+  
+  # Exposure limits
+  exposure:
+    # Long/short exposure
+    max_long_exposure: 1.0  # 100% long
+    max_short_exposure: 0.0  # No shorting (for now)
+    
+    # Gross and net exposure
+    max_gross_exposure: 1.0
+    target_net_exposure: 0.8  # Target 80% invested
+
+# =============================================================================
+# Regime-Specific Rules
+# =============================================================================
+regime_rules:
+  # Bull market regime
+  bull_market:
+    max_positions: 20
+    position_size: 0.10  # 10% per position
+    leverage: 1.0
+    stop_loss_pct: 0.03
+    sectors_to_favor:
+      - information_technology
+      - financials
+      - consumer_goods
+  
+  # Bear market regime
+  bear_market:
+    max_positions: 10
+    position_size: 0.05  # 5% per position
+    leverage: 0.5  # Reduce exposure
+    stop_loss_pct: 0.02  # Tighter stops
+    increase_cash: 0.30  # Hold 30% cash
+    sectors_to_favor:
+      - consumer_goods
+      - pharma
+  
+  # Sideways market regime
+  sideways_market:
+    max_positions: 15
+    position_size: 0.07
+    leverage: 0.8
+    stop_loss_pct: 0.025
+    holding_period: 5  # Shorter holding period
+  
+  # High volatility regime
+  high_volatility:
+    max_positions: 10
+    position_size: 0.05
+    leverage: 0.5
+    stop_loss_pct: 0.02
+    increase_cash: 0.20
+    reduce_frequency: true  # Trade less frequently
+
+# =============================================================================
+# Order Management Rules
+# =============================================================================
+order_management:
+  # Order types
+  preferred_order_type: "LIMIT"
+  
+  # Limit order settings
+  limit_orders:
+    price_offset: 0.001  # 0.1% from current price
+    timeout: 60  # seconds
+    max_retries: 3
+  
+  # Order validation
+  validation:
+    check_liquidity: true
+    min_liquidity_ratio: 0.01  # Order size < 1% of daily volume
+    
+    check_spread: true
+    max_spread_pct: 0.005  # Max 0.5% bid-ask spread
+    
+    check_circuit_limits: true
+  
+  # Order modification
+  modification:
+    allow_modification: true
+    max_modifications: 3
+    modification_delay: 5  # seconds
+  
+  # Order cancellation
+  cancellation:
+    auto_cancel_pending: true
+    cancel_after: 300  # Cancel pending orders after 5 minutes
+    cancel_on_market_close: true
+
+# =============================================================================
+# Trading Schedule
+# =============================================================================
+trading_schedule:
+  # Market hours (IST)
+  market_open: "09:15"
+  market_close: "15:30"
+  
+  # Strategy execution times
+  strategy_execution:
+    # When to run strategy logic
+    run_times:
+      - "09:30"  # After market stabilizes
+      - "11:00"  # Mid-morning
+      - "13:30"  # Post-lunch
+      - "15:00"  # Before close
+    
+    # Continuous execution
+    continuous_mode: true
+    execution_frequency: 5  # minutes
+  
+  # Rebalancing schedule
+  rebalancing:
+    frequency: "daily"  # or "weekly", "monthly"
+    time: "14:00"
+    
+  # Days to trade
+  trading_days:
+    monday: true
+    tuesday: true
+    wednesday: true
+    thursday: true
+    friday: true
+  
+  # Exclude days
+  exclude_days:
+    - "2024-01-26"  # Republic Day
+    - "2024-03-08"  # Mahashivratri
+    - "2024-03-25"  # Holi
+    - "2024-03-29"  # Good Friday
+    # Add more NSE holidays
+
+# =============================================================================
+# Performance Monitoring Rules
+# =============================================================================
+performance_monitoring:
+  # Metrics to track
+  track_metrics:
+    - total_return
+    - sharpe_ratio
+    - sortino_ratio
+    - max_drawdown
+    - win_rate
+    - profit_factor
+    - average_win
+    - average_loss
+    - expectancy
+  
+  # Alert thresholds
+  alerts:
+    sharpe_ratio_below: 1.0
+    max_drawdown_above: 0.10
+    win_rate_below: 0.45
+    daily_loss_above: 0.03
+  
+  # Reporting
+  reports:
+    daily: true
+    weekly: true
+    monthly: true
+
+# =============================================================================
+# Strategy-Specific Rules
+# =============================================================================
+strategy_specific:
+  # Qlib strategy rules
+  qlib:
+    min_prediction_score: 0.5
+    top_k_stocks: 30
+    rebalance_frequency: "weekly"
+  
+  # RL strategy rules
+  rl:
+    min_confidence: 0.6
+    use_in_regimes:
+      - bull_market
+      - sideways_market
+  
+  # Regime detection rules
+  regime_detection:
+    lookback_period: 60  # days
+    update_frequency: "daily"
+    confidence_threshold: 0.7
+
+# =============================================================================
+# Emergency Rules
+# =============================================================================
+emergency:
+  # Circuit breaker
+  circuit_breaker:
+    trigger_on_flash_crash: true
+    flash_crash_threshold: 0.05  # 5% market drop
+    
+    trigger_on_large_loss: true
+    large_loss_threshold: 0.05  # 5% portfolio loss
+    
+    action: "close_all_positions"  # or "stop_trading"
+  
+  # Kill switch
+  kill_switch:
+    manual_trigger: true
+    auto_trigger_conditions:
+      - consecutive_losses: 10
+      - daily_loss_pct: 0.05
+      - system_error_rate: 0.1
+  
+  # Recovery procedures
+  recovery:
+    wait_period: 3600  # Wait 1 hour before resuming
+    require_manual_approval: true
+    gradual_restart: true
+
+# =============================================================================
+# Compliance & Regulations
+# =============================================================================
+compliance:
+  # SEBI regulations
+  sebi:
+    position_limits: true
+    reporting_requirements: true
+  
+  # Tax considerations
+  tax:
+    track_stcg: true  # Short term capital gains
+    track_ltcg: true  # Long term capital gains
+    holding_period_threshold: 365  # days for LTCG
+  
+  # Audit trail
+  audit:
+    log_all_trades: true
+    log_all_decisions: true
+    retention_period: 1825  # 5 years
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: INFO
+  log_rule_evaluations: true
+  log_rule_violations: true
+  log_exits: true
+  log_risk_checks: true
+

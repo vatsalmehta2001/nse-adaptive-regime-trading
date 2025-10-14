@@ -1,0 +1,280 @@
+# Data Sources Configuration for OpenBB Platform
+# This file configures all market data providers and their settings
+
+# =============================================================================
+# OpenBB Platform Configuration
+# =============================================================================
+openbb:
+  # Default provider priority (first available will be used)
+  provider_priority:
+    - zerodha
+    - alpha_vantage
+    - yahoo_finance
+    - fred
+  
+  # Provider-specific settings
+  providers:
+    alpha_vantage:
+      enabled: true
+      api_key: ${OPENBB_ALPHA_VANTAGE_API_KEY}
+      rate_limit: 5  # requests per minute for free tier
+      timeout: 30
+    
+    fmp:
+      enabled: false
+      api_key: ${OPENBB_FMP_API_KEY}
+      rate_limit: 250
+      timeout: 30
+    
+    polygon:
+      enabled: false
+      api_key: ${OPENBB_POLYGON_API_KEY}
+      rate_limit: 5
+      timeout: 30
+    
+    fred:
+      enabled: true
+      api_key: ${OPENBB_FRED_API_KEY}
+      rate_limit: 120
+      timeout: 30
+    
+    yahoo_finance:
+      enabled: true
+      rate_limit: 2000  # requests per hour
+      timeout: 30
+
+# =============================================================================
+# Zerodha Kite Connect Configuration
+# =============================================================================
+zerodha:
+  enabled: true
+  api_key: ${ZERODHA_API_KEY}
+  api_secret: ${ZERODHA_API_SECRET}
+  
+  # WebSocket settings for real-time data
+  websocket:
+    enabled: true
+    reconnect_attempts: 5
+    reconnect_delay: 5  # seconds
+    ping_interval: 2.5
+    timeout: 30
+  
+  # Historical data settings
+  historical:
+    max_days_per_request: 60
+    rate_limit: 3  # requests per second
+    instruments_per_request: 1
+  
+  # Quote settings
+  quotes:
+    rate_limit: 10  # requests per second
+    instruments_per_request: 500
+
+# =============================================================================
+# NSE Symbol Universe
+# =============================================================================
+symbols:
+  # Index constituents
+  indices:
+    - NIFTY50
+    - NIFTY100
+    - NIFTY500
+    - NIFTYMIDCAP100
+    - NIFTYBANK
+  
+  # Stocks to trade (examples - customize based on your strategy)
+  equities:
+    large_cap:
+      - RELIANCE
+      - TCS
+      - HDFCBANK
+      - INFY
+      - ICICIBANK
+      - HINDUNILVR
+      - ITC
+      - SBIN
+      - BHARTIARTL
+      - KOTAKBANK
+      - LT
+      - AXISBANK
+      - ASIANPAINT
+      - MARUTI
+      - SUNPHARMA
+      - TITAN
+      - BAJFINANCE
+      - HCLTECH
+      - ULTRACEMCO
+      - WIPRO
+    
+    mid_cap:
+      - GODREJCP
+      - INDIGO
+      - ADANIPORTS
+      - TATAMOTORS
+      - VEDL
+      - GRASIM
+      - POWERGRID
+      - NTPC
+      - ONGC
+      - JSWSTEEL
+    
+    bank_nifty:
+      - HDFCBANK
+      - ICICIBANK
+      - KOTAKBANK
+      - SBIN
+      - AXISBANK
+      - INDUSINDBK
+      - BANDHANBNK
+      - AUBANK
+      - FEDERALBNK
+      - IDFCFIRSTB
+  
+  # Instruments to exclude (if any)
+  exclude:
+    - SYMBOL_TO_EXCLUDE  # Example
+
+# =============================================================================
+# Data Fetch Settings
+# =============================================================================
+data_fetch:
+  # Historical data range for backtesting
+  historical:
+    default_lookback_days: 730  # 2 years
+    min_lookback_days: 90
+    max_lookback_days: 1825  # 5 years
+  
+  # Timeframes to fetch
+  timeframes:
+    minute: 1  # 1-minute candles
+    minute_5: 5  # 5-minute candles
+    minute_15: 15
+    hour: 60
+    day: "1d"
+  
+  # Default timeframe for strategies
+  default_timeframe: "5"  # 5 minutes
+  
+  # Data quality checks
+  quality_checks:
+    remove_outliers: true
+    outlier_threshold: 5  # standard deviations
+    min_volume: 1000  # minimum volume per candle
+    fill_missing: true
+    fill_method: "ffill"  # forward fill
+  
+  # Caching
+  cache:
+    enabled: true
+    ttl: 3600  # seconds (1 hour)
+    backend: "redis"  # or "memory"
+    redis_db: 0
+
+# =============================================================================
+# Alternative Data Sources (Optional)
+# =============================================================================
+alternative_data:
+  # News sentiment
+  news:
+    enabled: false
+    providers:
+      - newsapi
+    update_frequency: "hourly"
+  
+  # Social media sentiment
+  social:
+    enabled: false
+    providers:
+      - twitter
+    update_frequency: "15min"
+  
+  # Economic calendar
+  economic:
+    enabled: true
+    providers:
+      - fred
+    update_frequency: "daily"
+
+# =============================================================================
+# Data Storage
+# =============================================================================
+storage:
+  # Local storage paths
+  raw_data_path: ${RAW_DATA_PATH}
+  processed_data_path: ${PROCESSED_DATA_PATH}
+  
+  # DuckDB settings
+  duckdb:
+    path: ${DUCKDB_PATH}
+    memory_limit: "4GB"
+    threads: 4
+  
+  # Parquet settings for large datasets
+  parquet:
+    compression: "snappy"
+    row_group_size: 100000
+  
+  # Data retention
+  retention:
+    raw_data_days: 365
+    processed_data_days: 180
+    intraday_data_days: 30
+
+# =============================================================================
+# Market Calendar
+# =============================================================================
+market_calendar:
+  timezone: "Asia/Kolkata"
+  
+  # NSE trading hours (IST)
+  trading_hours:
+    pre_open_start: "09:00"
+    open: "09:15"
+    close: "15:30"
+    post_close_end: "16:00"
+  
+  # Days of operation
+  trading_days:
+    - monday
+    - tuesday
+    - wednesday
+    - thursday
+    - friday
+  
+  # Holiday calendar
+  holidays_source: "exchange_calendars"  # Use NSE calendar
+  
+  # Corporate actions
+  corporate_actions:
+    check_frequency: "daily"
+    adjust_prices: true  # Adjust for splits/dividends
+
+# =============================================================================
+# Data Validation
+# =============================================================================
+validation:
+  # Price validation
+  price:
+    max_price_change: 0.20  # 20% circuit limit on NSE
+    min_price: 0.01
+    max_price: 100000
+  
+  # Volume validation
+  volume:
+    min_volume: 0
+    max_volume: 1000000000
+  
+  # OHLC validation
+  ohlc:
+    check_consistency: true  # High >= Open, Close, Low <= Open, Close
+    allow_equal_ohlc: true  # Allow all OHLC values to be equal (low volume)
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: INFO
+  log_api_calls: true
+  log_data_fetches: true
+  log_cache_hits: false
+

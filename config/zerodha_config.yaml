@@ -1,0 +1,375 @@
+# Zerodha Kite Connect Configuration
+# Configuration for order execution and live trading
+
+# =============================================================================
+# API Configuration
+# =============================================================================
+api:
+  # Credentials (loaded from environment)
+  api_key: ${ZERODHA_API_KEY}
+  api_secret: ${ZERODHA_API_SECRET}
+  user_id: ${ZERODHA_USER_ID}
+  password: ${ZERODHA_PASSWORD}
+  totp_secret: ${ZERODHA_TOTP_SECRET}
+  
+  # API endpoints
+  root_url: "https://api.kite.trade"
+  login_url: "https://kite.zerodha.com/connect/login"
+  
+  # Session management
+  session:
+    auto_login: false  # Manual login recommended for security
+    access_token_path: ".kite_access_token"  # Store access token
+    token_expiry_check: true
+  
+  # Rate limiting
+  rate_limits:
+    orders_per_second: 10
+    quotes_per_second: 1
+    historical_per_second: 3
+    order_trades_per_second: 1
+
+# =============================================================================
+# Trading Mode
+# =============================================================================
+trading:
+  # Mode: 'paper' for simulation, 'live' for real trading
+  mode: ${TRADING_MODE}  # Set in .env
+  
+  # Confirmation required for live trading
+  require_confirmation: true
+  
+  # Safety checks
+  safety:
+    max_order_value: 100000  # Maximum order value per trade
+    max_position_value: 500000  # Maximum position value
+    max_daily_trades: 100
+    max_open_positions: 20
+    
+    # Kill switch - stop trading if triggered
+    kill_switch:
+      max_daily_loss: 50000  # Stop if daily loss exceeds
+      max_drawdown: 0.15  # Stop at 15% drawdown
+      consecutive_losses: 10  # Stop after 10 consecutive losses
+
+# =============================================================================
+# Order Configuration
+# =============================================================================
+orders:
+  # Default order parameters
+  defaults:
+    exchange: "NSE"
+    product: "MIS"  # Intraday, CNC for delivery, NRML for F&O
+    order_type: "LIMIT"  # or "MARKET", "SL", "SL-M"
+    validity: "DAY"
+    
+  # Order types
+  order_types:
+    market:
+      enabled: true
+      use_only_for_exits: false  # Allow market orders for entries
+    
+    limit:
+      enabled: true
+      price_offset: 0.0005  # 0.05% from current price
+      
+    stop_loss:
+      enabled: true
+      trigger_offset: 0.01  # 1% stop loss
+    
+    bracket:
+      enabled: false  # Bracket orders for intraday
+      stop_loss_pct: 0.01
+      target_pct: 0.02
+  
+  # Order sizing
+  sizing:
+    method: "risk_based"  # or "fixed", "kelly", "optimal_f"
+    
+    # Risk-based sizing
+    risk_per_trade: 0.01  # Risk 1% of capital per trade
+    
+    # Fixed sizing
+    fixed_quantity: 1
+    fixed_capital: 10000  # Use fixed capital per trade
+    
+    # Kelly criterion
+    kelly_fraction: 0.5  # Use half Kelly
+  
+  # Order validation
+  validation:
+    check_capital: true
+    check_margin: true
+    check_circuit_limits: true
+    min_order_value: 100
+    max_order_value: 1000000
+
+# =============================================================================
+# Position Management
+# =============================================================================
+positions:
+  # Position limits
+  max_positions: 20
+  max_position_size: 0.20  # 20% of portfolio per position
+  min_position_size: 0.01  # 1% minimum
+  
+  # Position sizing method
+  sizing_method: "equal_weight"  # or "volatility_weighted", "risk_parity"
+  
+  # Rebalancing
+  rebalancing:
+    frequency: "daily"  # or "weekly", "monthly"
+    threshold: 0.05  # Rebalance if position drifts >5%
+    method: "target_weight"
+
+# =============================================================================
+# Risk Management
+# =============================================================================
+risk_management:
+  # Stop loss
+  stop_loss:
+    enabled: true
+    type: "trailing"  # or "fixed", "volatility_based"
+    
+    # Fixed stop loss
+    fixed_pct: 0.02  # 2% stop loss
+    
+    # Trailing stop loss
+    trailing_pct: 0.03  # 3% trailing stop
+    trail_after: 0.01  # Start trailing after 1% profit
+    
+    # Volatility-based stop
+    volatility_multiplier: 2.0  # 2x ATR
+  
+  # Take profit
+  take_profit:
+    enabled: true
+    targets:
+      - level: 0.02  # First target at 2%
+        reduce_by: 0.5  # Reduce position by 50%
+      - level: 0.05  # Second target at 5%
+        reduce_by: 1.0  # Close entire position
+  
+  # Position exposure limits
+  exposure:
+    max_sector_exposure: 0.30  # 30% max in one sector
+    max_single_stock: 0.10  # 10% max in one stock
+    max_beta_exposure: 1.5  # Maximum portfolio beta
+  
+  # Correlation limits
+  correlation:
+    max_correlation: 0.7  # Avoid highly correlated positions
+    check_correlation: true
+
+# =============================================================================
+# Execution Settings
+# =============================================================================
+execution:
+  # Order execution strategy
+  strategy: "smart"  # or "aggressive", "passive"
+  
+  # Smart execution
+  smart:
+    use_limit_orders: true
+    limit_order_timeout: 60  # seconds
+    fallback_to_market: true
+    price_improvement_attempts: 3
+  
+  # Slippage control
+  slippage:
+    max_slippage: 0.001  # 0.1% maximum
+    reject_on_high_slippage: true
+  
+  # Order modification
+  modification:
+    enabled: true
+    max_modifications: 3
+    modification_interval: 5  # seconds
+  
+  # Order cancellation
+  cancellation:
+    auto_cancel_unfilled: true
+    cancel_timeout: 300  # Cancel after 5 minutes
+
+# =============================================================================
+# Market Data Settings
+# =============================================================================
+market_data:
+  # WebSocket streaming
+  websocket:
+    enabled: true
+    reconnect: true
+    max_reconnect_attempts: 5
+    reconnect_delay: 5
+    
+  # Instruments to subscribe
+  subscribe:
+    mode: "quote"  # or "ltp", "full"
+    instruments: []  # Will be populated by strategy
+  
+  # Quote fetching
+  quotes:
+    batch_size: 500  # Max instruments per request
+    cache_ttl: 1  # seconds
+  
+  # Historical data
+  historical:
+    default_interval: "5minute"
+    cache_enabled: true
+    cache_duration: 3600  # 1 hour
+
+# =============================================================================
+# Account Monitoring
+# =============================================================================
+monitoring:
+  # Position monitoring
+  positions:
+    check_frequency: 60  # seconds
+    alert_on_large_moves: true
+    large_move_threshold: 0.05  # 5% price move
+  
+  # Margin monitoring
+  margins:
+    check_frequency: 300  # 5 minutes
+    alert_on_low_margin: true
+    low_margin_threshold: 0.20  # 20% available margin
+  
+  # Order monitoring
+  orders:
+    track_pending: true
+    track_rejected: true
+    alert_on_rejection: true
+
+# =============================================================================
+# Logging & Audit Trail
+# =============================================================================
+logging:
+  # Trade logging
+  trades:
+    log_all_trades: true
+    log_path: ${TRADE_LOG_PATH}
+    format: "json"
+    include_timestamps: true
+  
+  # Order logging
+  orders:
+    log_all_orders: true
+    log_modifications: true
+    log_cancellations: true
+  
+  # Error logging
+  errors:
+    log_api_errors: true
+    log_execution_errors: true
+    alert_on_critical: true
+
+# =============================================================================
+# Paper Trading Settings
+# =============================================================================
+paper_trading:
+  # Enable paper trading
+  enabled: true
+  
+  # Simulation settings
+  simulation:
+    initial_capital: 1000000
+    use_real_prices: true  # Fetch real market prices
+    simulate_slippage: true
+    slippage_model: "proportional"  # or "fixed"
+    slippage_bps: 10  # 10 basis points
+    
+    # Commission simulation
+    commission_model: "zerodha"  # Use Zerodha's actual rates
+    commission_bps: 3  # 0.03%
+    
+    # Order fills
+    fill_probability: 0.95  # 95% fill rate for limit orders
+    partial_fills: true
+  
+  # Paper trading portfolio
+  portfolio:
+    track_separately: true
+    save_state: true
+    state_file: "data/paper_portfolio.json"
+
+# =============================================================================
+# Security Settings
+# =============================================================================
+security:
+  # API key encryption
+  encrypt_credentials: true
+  encryption_key: ${JWT_SECRET_KEY}
+  
+  # IP whitelisting (if supported by Zerodha)
+  ip_whitelist:
+    enabled: false
+    allowed_ips: []
+  
+  # Two-factor authentication
+  totp:
+    enabled: true
+    regenerate_on_expiry: true
+
+# =============================================================================
+# Alerts & Notifications
+# =============================================================================
+alerts:
+  # Order alerts
+  orders:
+    notify_on_fill: true
+    notify_on_rejection: true
+    notify_on_cancellation: false
+  
+  # Position alerts
+  positions:
+    notify_on_stop_loss: true
+    notify_on_target_hit: true
+    notify_on_large_loss: true
+    large_loss_threshold: 10000
+  
+  # System alerts
+  system:
+    notify_on_error: true
+    notify_on_kill_switch: true
+    notify_on_disconnect: true
+
+# =============================================================================
+# Performance Tracking
+# =============================================================================
+performance:
+  # Real-time P&L tracking
+  track_pnl: true
+  pnl_update_frequency: 60  # seconds
+  
+  # Daily reports
+  daily_reports:
+    enabled: true
+    send_time: "16:00"  # After market close
+    include_metrics:
+      - daily_pnl
+      - win_rate
+      - total_trades
+      - largest_win
+      - largest_loss
+  
+  # Weekly reports
+  weekly_reports:
+    enabled: true
+    send_day: "friday"
+    send_time: "17:00"
+
+# =============================================================================
+# Debugging
+# =============================================================================
+debug:
+  # Debug mode
+  enabled: false
+  
+  # API request logging
+  log_requests: false
+  log_responses: false
+  
+  # Simulate failures
+  simulate_failures: false
+  failure_rate: 0.01  # 1% failure rate
+

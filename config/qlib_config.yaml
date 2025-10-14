@@ -1,0 +1,354 @@
+# Microsoft Qlib Configuration
+# Configuration for quantitative models and alpha factor generation
+
+# =============================================================================
+# Qlib Framework Settings
+# =============================================================================
+qlib:
+  provider_uri: ${QLIB_PROVIDER_URI}
+  region: ${QLIB_REGION}  # 'in' for India
+  market: ${QLIB_MARKET}  # 'NSE'
+  data_path: ${QLIB_DATA_PATH}
+  
+  # Qlib initialization
+  auto_mount: true
+  clear_cache: false
+  
+  # Executor settings
+  executor:
+    type: "ProcessPoolExecutor"
+    max_workers: 4
+
+# =============================================================================
+# Data Handler Configuration
+# =============================================================================
+data_handler:
+  class: DataHandlerLP
+  module_path: qlib.data.dataset
+  
+  kwargs:
+    start_time: "2020-01-01"
+    end_time: "2024-12-31"
+    fit_start_time: "2020-01-01"
+    fit_end_time: "2023-12-31"
+    
+    # Instruments (stocks) to include
+    instruments: "nifty100"  # Will be mapped to actual stock list
+    
+    # Data frequency
+    freq: "day"  # daily data
+    
+    # Infer-specific settings
+    infer_processors:
+      - class: RobustZScoreNorm
+        kwargs:
+          fields_group: feature
+          clip_outlier: true
+      - class: Fillna
+        kwargs:
+          fields_group: feature
+    
+    # Learning-specific settings
+    learn_processors:
+      - class: DropnaLabel
+      - class: CSRankNorm
+        kwargs:
+          fields_group: label
+    
+    # Label (target) definition
+    label:
+      - "Ref($close, -2) / Ref($close, -1) - 1"  # 1-day forward return
+
+# =============================================================================
+# Alpha-158 Features Configuration
+# =============================================================================
+features:
+  # Use Qlib's built-in Alpha158 factor library
+  use_alpha158: true
+  
+  # Alpha158 configuration
+  alpha158:
+    # Price-based features
+    kbar:
+      - "($close-$open)/$open"  # Close-to-open return
+      - "($high-$low)/$open"    # High-low range
+      - "($close-$open)/($high-$low+1e-12)"  # Close position
+      - "($high-Greater($open, $close))/$open"  # Upper shadow
+      - "($high-Greater($open, $close))/($high-$low+1e-12)"  # Upper shadow ratio
+      - "(Less($open, $close)-$low)/$open"  # Lower shadow
+      - "(Less($open, $close)-$low)/($high-$low+1e-12)"  # Lower shadow ratio
+      - "($close/Ref($close, 1) - 1)*100"  # Daily return
+    
+    # Volume-based features
+    volume:
+      - "($volume/$volume.rolling(5).mean() - 1)*100"  # Volume ratio
+      - "($volume/$volume.rolling(10).mean() - 1)*100"
+      - "($volume/$volume.rolling(20).mean() - 1)*100"
+      - "($volume/$volume.rolling(60).mean() - 1)*100"
+    
+    # Price trends (moving averages)
+    price_ma:
+      windows: [5, 10, 20, 30, 60]
+      operations:
+        - "Mean($close, D)"  # Simple moving average
+        - "($close/Mean($close, D) - 1)*100"  # Distance from MA
+    
+    # Volume trends
+    volume_ma:
+      windows: [5, 10, 20, 30, 60]
+      operations:
+        - "Mean($volume, D)"
+        - "($volume/Mean($volume, D) - 1)*100"
+    
+    # Volatility features
+    volatility:
+      windows: [5, 10, 20, 30, 60]
+      operations:
+        - "Std($close, D)"
+        - "Std($close/Ref($close, 1) - 1, D)"
+    
+    # Rolling correlations (return vs volume)
+    correlation:
+      windows: [5, 10, 20, 30, 60]
+    
+    # Momentum indicators
+    momentum:
+      windows: [5, 10, 20, 30, 60]
+      operations:
+        - "Ref($close, D)/$close - 1"  # Price momentum
+        - "Max($high, D)"  # Highest high
+        - "Min($low, D)"   # Lowest low
+        - "($close-Min($low, D))/(Max($high, D)-Min($low, D)+1e-12)"  # Stochastic
+    
+    # Additional technical indicators
+    technical:
+      - "MACD"
+      - "RSI"
+      - "BBANDS"
+      - "ATR"
+      - "OBV"
+  
+  # Custom features (beyond Alpha158)
+  custom:
+    enabled: true
+    features:
+      - "($close-$vwap)/$vwap"  # Close vs VWAP
+      - "($volume*$close).rolling(5).sum()/(5*$close)"  # Money flow
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+models:
+  # LightGBM model (primary)
+  lightgbm:
+    class: LGBModel
+    module_path: qlib.contrib.model.gbdt
+    
+    kwargs:
+      loss: mse
+      colsample_bytree: 0.8879
+      learning_rate: 0.0421
+      subsample: 0.8789
+      lambda_l1: 205.6999
+      lambda_l2: 580.9768
+      max_depth: 8
+      num_leaves: 210
+      num_threads: 8
+      early_stopping_rounds: 50
+      num_boost_round: 1000
+  
+  # XGBoost model (alternative)
+  xgboost:
+    class: XGBModel
+    module_path: qlib.contrib.model.xgboost
+    
+    kwargs:
+      max_depth: 6
+      learning_rate: 0.1
+      n_estimators: 100
+      objective: reg:squarederror
+      subsample: 0.8
+      colsample_bytree: 0.8
+      early_stopping_rounds: 50
+  
+  # CatBoost model (alternative)
+  catboost:
+    class: CatBoostModel
+    module_path: qlib.contrib.model.catboost_model
+    
+    kwargs:
+      iterations: 1000
+      learning_rate: 0.1
+      depth: 6
+      l2_leaf_reg: 3
+      early_stopping_rounds: 50
+
+# =============================================================================
+# Strategy Configuration
+# =============================================================================
+strategy:
+  class: TopkDropoutStrategy
+  module_path: qlib.contrib.strategy.signal_strategy
+  
+  kwargs:
+    # Portfolio construction
+    topk: 30  # Select top 30 stocks
+    n_drop: 5  # Drop 5 stocks at each rebalance
+    
+    # Risk settings
+    risk_degree: 0.95
+    
+    # Buffer to reduce turnover
+    buffer_margin: 10  # Buy/sell buffer
+    
+    # Holding period
+    hold_thresh: 1  # Hold for at least 1 day
+    only_tradable: true
+
+# =============================================================================
+# Backtest Configuration
+# =============================================================================
+backtest:
+  start_time: "2023-01-01"
+  end_time: "2024-12-31"
+  
+  # Account settings
+  account:
+    benchmark: "^NSEI"  # Nifty 50 as benchmark
+    account_value: 1000000  # 10 lakh initial capital
+  
+  # Execution settings
+  executor:
+    class: SimulatorExecutor
+    module_path: qlib.backtest.executor
+    
+    kwargs:
+      # Transaction costs
+      trade_exchange:
+        class: Exchange
+        module_path: qlib.backtest.exchange
+        
+        kwargs:
+          # NSE transaction costs
+          freq: day
+          limit_threshold: 0.095  # 9.5% circuit limit
+          deal_price: close  # Execute at close price
+          
+          # Costs
+          open_cost: 0.0003  # 0.03% brokerage + taxes
+          close_cost: 0.0003
+          min_cost: 5  # Minimum brokerage
+  
+  # Portfolio evaluation
+  portfolio_metrics:
+    - return
+    - sharpe
+    - max_drawdown
+    - information_ratio
+    - excess_return_without_cost
+    - excess_return_with_cost
+    - annualized_return
+    - volatility
+
+# =============================================================================
+# Training Configuration
+# =============================================================================
+training:
+  # Data splits
+  train_start: "2020-01-01"
+  train_end: "2023-06-30"
+  valid_start: "2023-07-01"
+  valid_end: "2023-12-31"
+  test_start: "2024-01-01"
+  test_end: "2024-12-31"
+  
+  # Training settings
+  epochs: 100
+  batch_size: 2000
+  early_stopping_patience: 20
+  
+  # Model saving
+  save_path: "models/qlib_models"
+  save_best_only: true
+  
+  # Retraining schedule
+  retrain_frequency: "monthly"  # Retrain every month
+  rolling_window: 730  # Use 2 years of data
+
+# =============================================================================
+# Prediction Configuration
+# =============================================================================
+prediction:
+  # Ensemble settings
+  use_ensemble: true
+  ensemble_method: "weighted_average"
+  
+  # Model weights for ensemble
+  model_weights:
+    lightgbm: 0.5
+    xgboost: 0.3
+    catboost: 0.2
+  
+  # Prediction post-processing
+  post_processing:
+    clip_extreme: true
+    clip_threshold: 3  # Standard deviations
+    normalize: true
+
+# =============================================================================
+# Feature Importance Analysis
+# =============================================================================
+feature_importance:
+  enabled: true
+  method: "shap"  # or "gain", "split"
+  save_path: "reports/feature_importance"
+  top_n: 50  # Analyze top 50 features
+
+# =============================================================================
+# Experiment Tracking
+# =============================================================================
+experiment:
+  # Qlib recorder
+  use_recorder: true
+  recorder_name: "mlflow"
+  
+  # Experiment name
+  experiment_name: "nse_adaptive_regime"
+  
+  # Logging
+  log_metrics: true
+  log_params: true
+  log_models: true
+  
+  # MLflow settings (optional)
+  mlflow:
+    tracking_uri: "file:./mlruns"
+    experiment_name: "qlib_models"
+
+# =============================================================================
+# Advanced Settings
+# =============================================================================
+advanced:
+  # Factor mining
+  factor_mining:
+    enabled: false
+    method: "genetic_programming"
+  
+  # Meta-learning
+  meta_learning:
+    enabled: false
+    
+  # Online learning
+  online_learning:
+    enabled: false
+    update_frequency: "weekly"
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: INFO
+  log_training: true
+  log_predictions: true
+  log_backtest: true
+

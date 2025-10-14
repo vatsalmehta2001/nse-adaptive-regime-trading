@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 Vatsal Mehta
+Copyright (c) 2025 NSE Adaptive Regime Trading System
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+ADDITIONAL TRADING DISCLAIMER:
+
+This software is designed for algorithmic trading and involves substantial
+financial risk. By using this software, you acknowledge that:
+
+1. Trading securities, derivatives, and other financial instruments involves
+   risk of financial loss.
+
+2. Past performance of trading strategies does not guarantee future results.
+
+3. The authors and contributors of this software are not registered investment
+   advisors and do not provide investment advice.
+
+4. You are solely responsible for any trading decisions made using this
+   software and any resulting financial outcomes.
+
+5. You should thoroughly test any trading strategy in simulation/paper trading
+   mode before deploying with real capital.
+
+6. You are responsible for compliance with all applicable securities laws and
+   regulations in your jurisdiction.
+
+THE AUTHORS AND CONTRIBUTORS DISCLAIM ALL LIABILITY FOR ANY FINANCIAL LOSSES,
+DAMAGES, OR OTHER CONSEQUENCES ARISING FROM THE USE OF THIS SOFTWARE.
