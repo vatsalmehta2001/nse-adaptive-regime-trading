@@ -73,8 +73,8 @@ def setup_data_pipeline(
             symbols=symbol_list,
             start_date=start_date,
             end_date=end_date,
-            batch_size=10,
-            max_workers=3,
+            batch_size=5,  # Reduced from 10 to avoid rate limits
+            max_workers=1,  # Changed from 3 to 1 to avoid API rate limiting
             validate=True,
             generate_features=False,
         )
