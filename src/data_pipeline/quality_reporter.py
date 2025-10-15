@@ -41,7 +41,8 @@ class DataQualityReporter:
         self,
         df: pd.DataFrame,
         audit_trail: Dict,
-        symbol: str = "ALL"
+        symbol: str = "ALL",
+        formats: List[str] = ['json', 'csv']
     ) -> Dict[str, Any]:
         """
         Generate comprehensive quality report.
@@ -50,6 +51,7 @@ class DataQualityReporter:
             df: Cleaned DataFrame
             audit_trail: Audit information from cleaning
             symbol: Symbol identifier
+            formats: List of output formats ('json', 'csv', 'html')
             
         Returns:
             Quality metrics dictionary
@@ -81,6 +83,10 @@ class DataQualityReporter:
         
         # Save report
         self._save_report(report, symbol)
+        
+        # Generate HTML if requested
+        if 'html' in formats:
+            self.generate_html_report(report, symbol)
         
         logger.info(f"Quality Score: {report['quality_score']:.1f}/100 ({report['quality_grade']})")
         
@@ -349,4 +355,129 @@ class DataQualityReporter:
                 print(f"  {severity_icon} [{issue['severity'].upper()}] {issue['type']}: {issue.get('description', 'N/A')}")
         
         print("\n" + "="*80 + "\n")
+    
+    def generate_html_report(self, report: Dict, symbol: str) -> str:
+        """
+        Generate HTML quality report.
+        
+        Args:
+            report: Quality report dictionary
+            symbol: Symbol identifier
+            
+        Returns:
+            Path to saved HTML file
+        """
+        html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Quality Report - {symbol}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+        h1 {{ color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }}
+        .score {{ font-size: 48px; font-weight: bold; text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; }}
+        .excellent {{ background: #4CAF50; color: white; }}
+        .good {{ background: #8BC34A; color: white; }}
+        .acceptable {{ background: #FFC107; color: white; }}
+        .poor {{ background: #F44336; color: white; }}
+        .metric {{ display: inline-block; width: 23%; margin: 10px 1%; padding: 15px; background: #f9f9f9; border-radius: 5px; text-align: center; }}
+        .metric-value {{ font-size: 24px; font-weight: bold; color: #2196F3; }}
+        .metric-label {{ color: #666; font-size: 14px; margin-top: 5px; }}
+        table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+        th {{ background: #2196F3; color: white; padding: 12px; text-align: left; }}
+        td {{ padding: 10px; border-bottom: 1px solid #ddd; }}
+        tr:hover {{ background: #f5f5f5; }}
+        .issue-high {{ color: #F44336; font-weight: bold; }}
+        .issue-medium {{ color: #FF9800; }}
+        .issue-low {{ color: #9E9E9E; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Quality Report: {symbol}</h1>
+        <p><strong>Generated:</strong> {timestamp}</p>
+        
+        <div class="score {grade_class}">
+            {quality_score:.1f} / 100
+            <div style="font-size: 20px; margin-top: 10px;">{quality_grade}</div>
+        </div>
+        
+        <h2>Key Metrics</h2>
+        <div>
+            <div class="metric">
+                <div class="metric-value">{total_rows:,}</div>
+                <div class="metric-label">Total Rows</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{retention_rate:.1f}%</div>
+                <div class="metric-label">Retention Rate</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{completeness:.1f}%</div>
+                <div class="metric-label">Completeness</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{filtered_rows:,}</div>
+                <div class="metric-label">Filtered Rows</div>
+            </div>
+        </div>
+        
+        <h2>Date Range</h2>
+        <p><strong>Start:</strong> {date_start} | <strong>End:</strong> {date_end} | <strong>Days:</strong> {total_days}</p>
+        
+        {extreme_values_section}
+        {issues_section}
+    </div>
+</body>
+</html>
+        """
+        
+        # Format grade class
+        grade_class = report['quality_grade'].lower()
+        
+        # Format extreme values section
+        extreme_values_section = ""
+        if report['extreme_values']:
+            extreme_values_section = "<h2>Extreme Values Filtered</h2><table><tr><th>Symbol</th><th>Count</th><th>Max Return</th><th>Min Return</th></tr>"
+            for sym, details in report['extreme_values'].items():
+                extreme_values_section += f"<tr><td>{sym}</td><td>{details['count']}</td><td>{details['max_return']*100:+.2f}%</td><td>{details['min_return']*100:+.2f}%</td></tr>"
+            extreme_values_section += "</table>"
+        
+        # Format issues section
+        issues_section = ""
+        if report['data_issues']:
+            issues_section = "<h2>Data Issues</h2><table><tr><th>Severity</th><th>Type</th><th>Description</th></tr>"
+            for issue in report['data_issues']:
+                severity_class = f"issue-{issue['severity']}"
+                issues_section += f"<tr class='{severity_class}'><td>{issue['severity'].upper()}</td><td>{issue['type']}</td><td>{issue.get('description', 'N/A')}</td></tr>"
+            issues_section += "</table>"
+        
+        # Fill template
+        html_content = html_template.format(
+            symbol=report['symbol'],
+            timestamp=report['timestamp'],
+            quality_score=report['quality_score'],
+            quality_grade=report['quality_grade'],
+            grade_class=grade_class,
+            total_rows=report['data_quality']['total_rows'],
+            retention_rate=report['data_quality']['retention_rate']*100,
+            completeness=report['missing_data'].get('completeness', 1.0)*100,
+            filtered_rows=report['data_quality']['filtered_rows'],
+            date_start=report['data_range'].get('start', 'N/A'),
+            date_end=report['data_range'].get('end', 'N/A'),
+            total_days=report['data_range'].get('total_days', 0),
+            extreme_values_section=extreme_values_section,
+            issues_section=issues_section
+        )
+        
+        # Save HTML file
+        timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
+        html_path = self.output_dir / f"quality_report_{symbol}_{timestamp}.html"
+        
+        with open(html_path, 'w') as f:
+            f.write(html_content)
+        
+        logger.info(f"HTML report saved: {html_path}")
+        return str(html_path)
 

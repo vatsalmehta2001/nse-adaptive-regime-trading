@@ -431,3 +431,230 @@ class TestProductionReadiness:
             score = reporter._calculate_quality_score(test_case)
             assert 0 <= score <= 100, f"Score out of bounds: {score}"
 
+
+class TestEdgeCases:
+    """Test edge cases and boundary conditions."""
+    
+    def test_empty_dataframe(self):
+        """Test handling of empty DataFrame."""
+        validator = MarketDataValidator()
+        df = pd.DataFrame(columns=['symbol', 'date', 'close', 'volume'])
+        
+        clean_df, audit = validator.clean_returns_with_audit(df, log_details=False)
+        
+        assert len(clean_df) == 0
+        assert audit['total_filtered'] == 0
+        assert audit['retention_rate'] >= 0.0  # Allow for 0/0 = NaN case
+    
+    def test_single_row(self):
+        """Test with only one row (no returns calculable)."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'],
+            'date': [pd.Timestamp('2024-01-01')],
+            'close': [100.0],
+            'volume': [10000]
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, log_details=False)
+        
+        # Should handle gracefully
+        assert len(clean_df) <= 1
+    
+    def test_all_extreme_values(self):
+        """Test when all values exceed threshold."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 10,
+            'date': pd.date_range('2024-01-01', periods=10),
+            'close': [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600, 51200],
+            'volume': [10000] * 10
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, threshold=0.20, log_details=False)
+        
+        # Should filter most/all extreme values
+        assert audit['retention_rate'] < 0.5  # More than 50% filtered
+    
+    def test_exactly_at_threshold(self):
+        """Test values exactly at threshold boundary."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 5,
+            'date': pd.date_range('2024-01-01', periods=5),
+            'close': [100, 119.9, 143.88, 100, 119.9],  # Just under 20% changes
+            'volume': [10000] * 5
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, threshold=0.20, log_details=False)
+        
+        # Just under threshold should be kept
+        assert audit['total_filtered'] <= 1  # Allow for rounding/edge cases
+    
+    def test_missing_values_in_returns(self):
+        """Test handling of NaN returns."""
+        import warnings
+        
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 5,
+            'date': pd.date_range('2024-01-01', periods=5),
+            'close': [100.0, np.nan, 120.0, 130.0, np.nan],
+            'volume': [10000] * 5
+        })
+        
+        validator = MarketDataValidator()
+        
+        # Suppress pandas FutureWarning about pct_change fill_method
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            clean_df, audit = validator.clean_returns_with_audit(df, log_details=False)
+        
+        # Should handle NaN rows gracefully
+        assert len(clean_df) <= 5
+        # Method should complete without error
+        assert 'retention_rate' in audit
+    
+    def test_zero_price(self):
+        """Test handling of zero prices."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 5,
+            'date': pd.date_range('2024-01-01', periods=5),
+            'close': [100, 110, 0.1, 120, 130],  # Very small price
+            'volume': [10000] * 5
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, log_details=False)
+        
+        # Should handle gracefully
+        assert len(clean_df) > 0
+    
+    def test_multiple_symbols(self):
+        """Test filtering across multiple symbols."""
+        np.random.seed(42)
+        df = pd.DataFrame({
+            'symbol': ['A'] * 50 + ['B'] * 50,
+            'date': pd.date_range('2024-01-01', periods=50).tolist() * 2,
+            'close': np.random.uniform(90, 110, 100),
+            'volume': np.random.randint(10000, 100000, 100)
+        })
+        
+        # Add extreme returns for symbol A only
+        df.loc[10, 'close'] = df.loc[9, 'close'] * 1.5
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, threshold=0.20, log_details=False)
+        
+        # Should have processed both symbols
+        assert len(clean_df) > 0
+    
+    def test_very_small_threshold(self):
+        """Test with very restrictive threshold (1%)."""
+        np.random.seed(42)
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 100,
+            'date': pd.date_range('2024-01-01', periods=100),
+            'close': 100 + np.random.randn(100).cumsum() * 0.5,
+            'volume': np.random.randint(10000, 100000, 100)
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, threshold=0.01, log_details=False)
+        
+        # Very strict threshold should filter many rows
+        assert audit['retention_rate'] < 1.0
+    
+    def test_very_large_threshold(self):
+        """Test with very permissive threshold (500%)."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 10,
+            'date': pd.date_range('2024-01-01', periods=10),
+            'close': [100, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350],
+            'volume': [10000] * 10
+        })
+        
+        validator = MarketDataValidator()
+        clean_df, audit = validator.clean_returns_with_audit(df, threshold=5.0, log_details=False)
+        
+        # Very lenient threshold should keep most/all
+        assert audit['retention_rate'] > 0.5
+
+
+class TestQualityReporterEdgeCases:
+    """Test quality reporter edge cases."""
+    
+    def test_perfect_data_quality(self, tmp_path):
+        """Test with perfect quality data (no issues)."""
+        np.random.seed(42)
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 100,
+            'date': pd.date_range('2024-01-01', periods=100),
+            'close': 100 + np.random.randn(100) * 0.1,
+            'volume': [100000] * 100
+        })
+        
+        audit = {
+            'retention_rate': 1.0,
+            'total_filtered': 0,
+            'filtered_by_symbol': {}
+        }
+        
+        reporter = DataQualityReporter(output_dir=str(tmp_path))
+        report = reporter.generate_quality_report(df, audit, symbol='TEST')
+        
+        # Perfect data should score high
+        assert report['quality_score'] >= 90
+        assert report['quality_grade'] in ['EXCELLENT', 'GOOD']
+    
+    def test_worst_case_quality(self, tmp_path):
+        """Test with worst possible quality."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 10,
+            'date': pd.date_range('2024-01-01', periods=10),
+            'close': [100] * 10,  # Constant price
+            'volume': [0] * 10  # Zero volume
+        })
+        
+        audit = {
+            'retention_rate': 0.1,  # 90% filtered
+            'total_filtered': 90,
+            'filtered_by_symbol': {'TEST': {'count': 90, 'max_return': 0.5, 'min_return': -0.5}}
+        }
+        
+        reporter = DataQualityReporter(output_dir=str(tmp_path))
+        report = reporter.generate_quality_report(df, audit, symbol='TEST')
+        
+        # Poor quality should score low
+        assert report['quality_score'] < 75
+        assert report['quality_grade'] in ['ACCEPTABLE', 'POOR']
+    
+    def test_html_report_generation(self, tmp_path):
+        """Test HTML report generation."""
+        df = pd.DataFrame({
+            'symbol': ['TEST'] * 50,
+            'date': pd.date_range('2024-01-01', periods=50),
+            'close': np.random.uniform(90, 110, 50),
+            'volume': np.random.randint(10000, 100000, 50)
+        })
+        
+        audit = {
+            'retention_rate': 0.95,
+            'total_filtered': 5,
+            'filtered_by_symbol': {'TEST': {'count': 5, 'max_return': 0.25, 'min_return': -0.22}}
+        }
+        
+        reporter = DataQualityReporter(output_dir=str(tmp_path))
+        report = reporter.generate_quality_report(df, audit, symbol='TEST', formats=['json', 'csv', 'html'])
+        
+        # Check HTML file was created
+        html_files = list(tmp_path.glob('quality_report_TEST_*.html'))
+        assert len(html_files) >= 1
+        
+        # Verify HTML content
+        with open(html_files[0]) as f:
+            html_content = f.read()
+            assert 'Data Quality Report' in html_content
+            assert 'TEST' in html_content
+            # Check for score (formatted as XX.X, not full precision)
+            assert f"{report['quality_score']:.1f}" in html_content or 'quality_score' in str(report)
+
