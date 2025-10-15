@@ -1,0 +1,189 @@
+# Data Quality Configuration
+# Production-grade thresholds for NSE market data validation
+
+# =============================================================================
+# RETURN THRESHOLDS
+# =============================================================================
+thresholds:
+  returns:
+    # Based on NSE circuit breaker limits and market analysis
+    daily: 0.20      # 20% max daily return (circuit breaker limit)
+    weekly: 0.50     # 50% max weekly return
+    monthly: 1.00    # 100% max monthly return
+    
+    # Special thresholds for different scenarios
+    small_cap: 0.25  # 25% for small caps (more volatile)
+    large_cap: 0.15  # 15% for large caps (more stable)
+  
+  prices:
+    min_price: 1.0             # Minimum valid price (INR)
+    max_price: 100000.0        # Maximum reasonable price
+    max_intraday_jump: 0.30    # 30% max intraday move
+    max_gap_up: 0.20           # 20% max overnight gap up
+    max_gap_down: 0.20         # 20% max overnight gap down
+  
+  volume:
+    min_volume: 0              # Allow zero volume (but flag it)
+    min_avg_volume: 10000      # Minimum average daily volume
+    max_volume_spike: 10.0     # 10x avg volume = suspicious
+  
+  completeness:
+    min_data_points: 60               # Minimum days for reliable analysis
+    max_missing_ratio: 0.10           # Max 10% missing data
+    min_trading_days_per_month: 15    # Minimum trading days expected
+
+# =============================================================================
+# DATA QUALITY REPORTING
+# =============================================================================
+reporting:
+  # Output configuration
+  output_dir: "reports/data_quality"
+  
+  # Format options
+  save_json: true      # Save detailed JSON reports
+  save_csv: true       # Save CSV summaries
+  save_html: false     # Save HTML reports (requires jinja2)
+  
+  # Logging options
+  log_details: true              # Log detailed filtering info
+  log_extreme_values: true       # Log each extreme value
+  max_extreme_logs: 10           # Limit number of extreme values logged per symbol
+  
+  # Audit trail
+  save_audit_trail: true         # Save audit trail to database
+  audit_retention_days: 90       # Keep audit trail for 90 days
+
+# =============================================================================
+# QUALITY SCORE GRADING
+# =============================================================================
+quality_score:
+  # Score thresholds for grades
+  excellent: 90      # >= 90 = EXCELLENT (production ready)
+  good: 75           # >= 75 = GOOD (minor issues, usable)
+  acceptable: 60     # >= 60 = ACCEPTABLE (review carefully)
+  poor: 0            # <  60 = POOR (fix issues before use)
+  
+  # Scoring weights
+  weights:
+    retention_rate: 20      # Weight for data retention
+    completeness: 30        # Weight for data completeness
+    extreme_values: 20      # Weight for extreme value issues
+    missing_values: 20      # Weight for missing values
+    other_issues: 10        # Weight for other issues
+  
+  # Actions based on score
+  actions:
+    excellent:
+      allow_training: true
+      allow_backtesting: true
+      require_review: false
+    
+    good:
+      allow_training: true
+      allow_backtesting: true
+      require_review: false
+    
+    acceptable:
+      allow_training: true
+      allow_backtesting: true
+      require_review: true    # Require manual review
+    
+    poor:
+      allow_training: false   # Block training
+      allow_backtesting: false
+      require_review: true
+      require_fixes: true
+
+# =============================================================================
+# FILTERING BEHAVIOR
+# =============================================================================
+filtering:
+  # What to do with filtered data
+  save_filtered_data: true      # Save filtered rows for review
+  filtered_data_dir: "reports/data_quality/filtered"
+  
+  # Notification thresholds
+  warn_if_filtered_pct: 0.05    # Warn if >5% data filtered
+  error_if_filtered_pct: 0.20   # Error if >20% data filtered
+  
+  # Auto-fixing options
+  auto_fix_minor_issues: true   # Auto-fix minor issues (zero volume, etc.)
+  auto_fill_missing: false      # Don't auto-fill missing data
+  
+  # Corporate action handling
+  adjust_for_splits: true       # Adjust for stock splits
+  adjust_for_dividends: false   # Don't adjust for dividends (affects returns)
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+validation:
+  # OHLC consistency
+  check_ohlc_consistency: true   # Ensure high >= low, close between high/low
+  max_ohlc_violations: 0         # Zero tolerance for OHLC violations
+  
+  # Price continuity
+  check_price_gaps: true         # Check for suspicious gaps
+  max_consecutive_gaps: 3        # Max consecutive gap days
+  
+  # Volume patterns
+  check_volume_patterns: true    # Check for suspicious volume
+  flag_zero_volume: true         # Flag (but don't remove) zero volume days
+  
+  # Trading calendar
+  validate_trading_days: true    # Ensure data only on trading days
+  remove_non_trading_days: true  # Remove weekends/holidays
+
+# =============================================================================
+# ALERT THRESHOLDS
+# =============================================================================
+alerts:
+  # When to raise alerts
+  high_priority:
+    - quality_score < 60
+    - retention_rate < 0.80
+    - completeness < 0.90
+  
+  medium_priority:
+    - quality_score < 75
+    - extreme_values > 100
+  
+  low_priority:
+    - zero_volume_days > 10
+    - missing_days > 5
+
+# =============================================================================
+# EXPORT OPTIONS
+# =============================================================================
+export:
+  # Include in reports
+  include_extreme_values_list: true
+  include_missing_dates_list: true
+  include_quality_trends: true
+  
+  # Comparison reports
+  generate_cross_symbol_comparison: true
+  highlight_outliers: true
+  
+  # Time-series quality tracking
+  track_quality_over_time: true
+  quality_tracking_window: 30  # days
+
+# =============================================================================
+# PRODUCTION SETTINGS
+# =============================================================================
+production:
+  # Minimum acceptable standards
+  min_quality_score: 75          # Require "GOOD" or better
+  min_retention_rate: 0.90       # Require 90% data retention
+  min_completeness: 0.95         # Require 95% completeness
+  
+  # Fail-safe
+  halt_on_poor_quality: true     # Stop pipeline if quality is poor
+  require_manual_override: true   # Require manual confirmation for poor quality
+  
+  # Logging
+  log_level: INFO
+  save_logs: true
+  log_retention_days: 30
+

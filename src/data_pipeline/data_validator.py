@@ -19,6 +19,49 @@ from src.utils.market_calendar import NSEMarketCalendar
 logger = get_logger(__name__)
 
 
+class DataQualityConfig:
+    """
+    Configuration for data quality thresholds.
+    
+    Production-grade thresholds based on market analysis and risk management.
+    """
+    
+    # Return thresholds (realistic for Indian markets)
+    MAX_DAILY_RETURN = 0.20  # 20% circuit breaker limit
+    MAX_WEEKLY_RETURN = 0.50  # 50%
+    MAX_MONTHLY_RETURN = 1.00  # 100%
+    
+    # Price thresholds
+    MIN_PRICE = 1.0  # Minimum valid price (INR)
+    MAX_INTRADAY_JUMP = 0.30  # 30% intraday move
+    
+    # Volume thresholds
+    MIN_VOLUME = 0  # Allow zero volume (mark separately)
+    MIN_AVG_VOLUME = 10000  # Minimum average volume
+    
+    # Data completeness
+    MIN_DATA_POINTS = 60  # Minimum days for factor calculation
+    MAX_MISSING_DAYS_RATIO = 0.10  # Max 10% missing days
+    
+    @classmethod
+    def get_threshold(cls, period: str = 'daily') -> float:
+        """
+        Get appropriate threshold for time period.
+        
+        Args:
+            period: 'daily', 'weekly', or 'monthly'
+            
+        Returns:
+            Threshold value
+        """
+        thresholds = {
+            'daily': cls.MAX_DAILY_RETURN,
+            'weekly': cls.MAX_WEEKLY_RETURN,
+            'monthly': cls.MAX_MONTHLY_RETURN
+        }
+        return thresholds.get(period, cls.MAX_DAILY_RETURN)
+
+
 class MarketDataValidator:
     """
     Validate and clean market data using Pandera schemas and custom rules.
@@ -483,4 +526,96 @@ class MarketDataValidator:
         logger.info(f"Quality report generated: {report['data_quality']['status']} quality")
 
         return report
+    
+    def clean_returns_with_audit(
+        self,
+        df: pd.DataFrame,
+        threshold: float = 0.20,
+        log_details: bool = True
+    ) -> Tuple[pd.DataFrame, Dict]:
+        """
+        Filter extreme returns with comprehensive audit trail.
+        
+        Production-grade filtering with detailed logging of all removed data.
+        
+        Args:
+            df: DataFrame with returns column (or close for calculation)
+            threshold: Maximum absolute return (default 20% = NSE circuit breaker)
+            log_details: Whether to log detailed filtering info
+            
+        Returns:
+            Tuple of (cleaned_df, audit_report)
+        """
+        initial_rows = len(df)
+        audit_report = {
+            'initial_rows': initial_rows,
+            'threshold_used': threshold,
+            'filtered_by_symbol': {},
+            'extreme_dates': [],
+            'total_filtered': 0,
+            'retention_rate': 0.0
+        }
+        
+        # Ensure we have returns column
+        df = df.copy()
+        if 'returns' not in df.columns:
+            if 'close' in df.columns:
+                df['returns'] = df.groupby('symbol')['close'].pct_change()
+            else:
+                logger.error("DataFrame must have 'returns' or 'close' column")
+                return df, audit_report
+        
+        # Identify extreme returns
+        extreme_mask = df['returns'].abs() > threshold
+        extreme_df = df[extreme_mask].copy()
+        
+        if len(extreme_df) > 0:
+            logger.info(f"Found {len(extreme_df)} rows with extreme returns (>{threshold*100:.0f}%)")
+            
+            # Log by symbol
+            for symbol in extreme_df['symbol'].unique():
+                symbol_extreme = extreme_df[extreme_df['symbol'] == symbol]
+                
+                audit_report['filtered_by_symbol'][symbol] = {
+                    'count': len(symbol_extreme),
+                    'dates': symbol_extreme['date'].astype(str).tolist(),
+                    'returns': symbol_extreme['returns'].tolist(),
+                    'max_return': float(symbol_extreme['returns'].max()),
+                    'min_return': float(symbol_extreme['returns'].min())
+                }
+                
+                if log_details:
+                    logger.warning(
+                        f"Symbol {symbol}: Filtering {len(symbol_extreme)} extreme returns "
+                        f"(>{threshold*100:.0f}%)"
+                    )
+                    for _, row in symbol_extreme.head(5).iterrows():
+                        logger.warning(
+                            f"  {row['date']:%Y-%m-%d}: {row['returns']*100:+.2f}% return"
+                        )
+                    if len(symbol_extreme) > 5:
+                        logger.warning(f"  ... and {len(symbol_extreme)-5} more dates")
+                
+                # Track extreme dates
+                for _, row in symbol_extreme.iterrows():
+                    audit_report['extreme_dates'].append({
+                        'symbol': symbol,
+                        'date': str(row['date']),
+                        'return': float(row['returns']),
+                        'close': float(row['close']) if 'close' in row else None
+                    })
+        
+        # Filter extreme returns
+        df_clean = df[~extreme_mask].copy()
+        
+        audit_report['total_filtered'] = initial_rows - len(df_clean)
+        audit_report['retention_rate'] = len(df_clean) / initial_rows if initial_rows > 0 else 0
+        audit_report['final_rows'] = len(df_clean)
+        
+        logger.info(
+            f"Data Quality Filter: {len(df_clean):,}/{initial_rows:,} rows retained "
+            f"({audit_report['retention_rate']*100:.1f}%)"
+        )
+        
+        return df_clean, audit_report
 

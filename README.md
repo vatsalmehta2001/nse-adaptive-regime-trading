@@ -119,20 +119,23 @@ cd nse-adaptive-regime-trading
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install dependencies and package (IMPORTANT: This is the correct way)
 pip install --upgrade pip
 pip install -r requirements.txt
-
-# Install the package in editable mode
 pip install -e .
 
-# Set up Qlib data
+# Verify installation
+python -c "from src.data_pipeline import DataPipeline; print('✅ Installation successful')"
+
+# Set up Qlib data (optional - if using Qlib features)
 python scripts/setup_qlib_data.py --market NSE --region IN
 
 # Configure environment variables
 cp .env.example .env
 # Edit .env with your Zerodha API credentials
 ```
+
+**Note:** The `pip install -e .` step is **required** for proper module imports. This makes the `src` package importable throughout the system.
 
 ### Configuration
 

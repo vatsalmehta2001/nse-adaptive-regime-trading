@@ -175,11 +175,12 @@ class QlibModelTrainer:
         y = forward_returns.copy()
         
         # Remove NaN, inf, and extreme values
+        # Use 20% threshold (NSE circuit breaker limit) instead of 1000%
         valid_mask = ~(
             X.isna().any(axis=1) | 
             y.isna() | 
             np.isinf(y) | 
-            (np.abs(y) > 10)  # Remove returns > 1000% (likely data errors)
+            (np.abs(y) > 0.20)  # Remove returns > 20% (circuit breaker limit)
         )
         X = X[valid_mask]
         y = y[valid_mask]
