@@ -69,7 +69,10 @@ test-performance:
 
 # Trading operations
 setup-data:
-	python scripts/setup_qlib_data.py --market NSE --region IN
+	python scripts/setup_data_pipeline.py --symbols NIFTY50 --years 2
+
+update-data:
+	python -c "from src.data_pipeline.pipeline import DataPipeline; DataPipeline().update_data()"
 
 train-qlib:
 	python scripts/train_qlib_models.py --config config/qlib_config.yaml

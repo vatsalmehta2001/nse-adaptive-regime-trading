@@ -2,8 +2,8 @@
 Feature Engineering Module.
 
 Implements feature generation including:
-- Qlib Alpha-158 factors
-- Technical indicators
+- Technical indicators (RSI, MACD, Bollinger Bands, etc.)
+- Qlib Alpha-158 factors (to be implemented)
 - Custom features
 - Regime-specific features
 """
@@ -11,13 +11,9 @@ Implements feature generation including:
 from typing import List
 
 __all__: List[str] = [
-    "Alpha158Features",
     "TechnicalIndicators",
-    "CustomFeatures",
 ]
 
-# Import main classes when they are implemented
-# from src.feature_engineering.alpha158 import Alpha158Features
-# from src.feature_engineering.technical_indicators import TechnicalIndicators
-# from src.feature_engineering.custom_features import CustomFeatures
+# Import main classes
+from src.feature_engineering.technical_indicators import TechnicalIndicators
 
