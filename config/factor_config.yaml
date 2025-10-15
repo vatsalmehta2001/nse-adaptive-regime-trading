@@ -1,0 +1,148 @@
+# Factor Generation Configuration
+
+qlib_factors:
+  alpha158:
+    enabled: true
+    
+    # Periods for factor calculation
+    periods:
+      roc: [5, 10, 20, 30, 60]
+      ma: [5, 10, 20, 30, 60]
+      std: [5, 10, 20, 30, 60]
+      volume: [5, 10, 20, 30]
+    
+    # Normalization settings
+    normalization:
+      enabled: true
+      method: "zscore"  # zscore, minmax, robust
+      winsorize: true
+      limits: [0.01, 0.99]  # Winsorization limits
+    
+    # Cross-sectional features
+    cross_sectional:
+      enabled: true
+      min_symbols: 30  # Minimum symbols required for cross-sectional features
+
+# Regime Detection Configuration
+regime_detection:
+  method: "wasserstein"  # wasserstein or hmm
+  
+  wasserstein:
+    n_regimes: 4
+    window_size: 60  # Rolling window for distributions
+    
+    # Validation against known events
+    validation:
+      covid_crash:
+        start: "2020-03-01"
+        end: "2020-03-31"
+        expected: "crash"
+      
+      post_covid_bull:
+        start: "2020-04-01"
+        end: "2021-01-31"
+        expected: "bull"
+      
+      ukraine_volatility:
+        start: "2022-02-24"
+        end: "2022-03-31"
+        expected: "high_volatility"
+  
+  hmm:
+    n_regimes: 4
+    n_iter: 100
+    covariance: "full"  # full, tied, diag, spherical
+    features: ["returns", "volatility"]
+
+# Feature Engineering
+feature_engineering:
+  regime_features:
+    enabled: true
+    interactions: true
+    top_n: 20  # Top N factors for interaction features
+  
+  stability_features:
+    enabled: true
+    include_persistence: true
+
+# Feature Store Configuration
+feature_store:
+  incremental: true
+  batch_size: 10
+  overwrite_existing: false
+  
+  # Database settings
+  database:
+    path: "data/trading_db.duckdb"
+    create_indexes: true
+
+# Factor Analysis Configuration
+factor_analysis:
+  # Information Coefficient settings
+  ic_periods: [1, 5, 20]
+  ic_method: "spearman"  # spearman or pearson
+  
+  # Correlation thresholds
+  correlation_threshold: 0.8
+  
+  # VIF threshold for multicollinearity
+  vif_threshold: 10.0
+  
+  # Top factor selection
+  top_n_factors: 50
+  remove_correlated: true
+  
+  # Reporting
+  generate_report: true
+  report_path: "reports/factor_analysis.html"
+
+# Pipeline Settings
+pipeline:
+  # Parallel processing
+  parallel: false
+  max_workers: 1
+  
+  # Logging
+  log_level: "INFO"
+  log_file: "logs/factor_generation.log"
+  
+  # Error handling
+  continue_on_error: true
+  max_retries: 3
+
+# Data Quality
+data_quality:
+  # Minimum data requirements
+  min_days: 252  # Minimum trading days required
+  min_coverage: 0.8  # Minimum data coverage (80%)
+  
+  # Outlier detection
+  outlier_method: "iqr"  # iqr, zscore, isolation_forest
+  outlier_threshold: 3.0
+  
+  # NaN handling
+  fillna_method: "ffill"  # ffill, bfill, interpolate
+  drop_threshold: 0.5  # Drop factors with >50% NaN
+
+# Performance Optimization
+performance:
+  # Vectorization
+  use_numba: false
+  chunk_size: 5000
+  
+  # Caching
+  cache_factors: true
+  cache_ttl: 86400  # 24 hours in seconds
+  
+  # Memory management
+  gc_interval: 10  # Run garbage collection every N symbols
+
+# Backtesting Integration
+backtesting:
+  enabled: false
+  train_test_split: 0.7
+  validation_split: 0.15
+  
+  # Forward-looking periods for IC
+  forward_periods: [1, 5, 10, 20]
+
