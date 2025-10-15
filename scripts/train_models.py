@@ -302,10 +302,15 @@ def main():
     
     logger.info(f"Loaded {len(factors)} factor rows")
     
-    # Check for price column
-    if 'close' not in factors.columns:
-        logger.error("No 'close' price column found in factors. Cannot calculate forward returns.")
+    # Check for price column (factor_001 is close price in Alpha-158)
+    if 'close' not in factors.columns and 'factor_001' not in factors.columns:
+        logger.error("No 'close' or 'factor_001' price column found. Cannot calculate forward returns.")
         return
+    
+    # Add close column if not present (use factor_001 which is close price in Alpha-158)
+    if 'close' not in factors.columns:
+        factors['close'] = factors['factor_001']
+        logger.info("Using factor_001 as close price column")
     
     # Train models
     if args.regime_adaptive:

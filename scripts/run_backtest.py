@@ -337,6 +337,16 @@ def main():
     
     logger.info(f"Loaded {len(factors)} factor rows")
     
+    # Check for price column (factor_001 is close price in Alpha-158)
+    if 'close' not in factors.columns and 'factor_001' not in factors.columns:
+        logger.error("No 'close' or 'factor_001' price column found for backtesting.")
+        return
+    
+    # Add close column if not present (use factor_001 which is close price in Alpha-158)
+    if 'close' not in factors.columns:
+        factors['close'] = factors['factor_001']
+        logger.info("Using factor_001 as close price column")
+    
     # Extract prices for backtest
     if isinstance(factors.index, pd.MultiIndex):
         prices = factors[['close']].copy()

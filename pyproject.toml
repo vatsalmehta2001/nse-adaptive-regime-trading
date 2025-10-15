@@ -113,8 +113,7 @@ Issues = "https://github.com/yourusername/nse-adaptive-regime-trading/issues"
 nse-trade = "src.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "."}
-packages = ["src"]
+packages = {find = {where = ["."], include = ["src*"]}}
 
 [tool.setuptools.package-data]
 src = ["py.typed"]
