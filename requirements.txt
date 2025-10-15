@@ -1,183 +1,131 @@
 # NSE Adaptive Regime Trading System - Requirements
 # Python 3.11+ required
 # 
-# Installation order matters for some dependencies
-# Install in the order listed to avoid conflicts
+# IMPORTANT: Install using pip with --only-binary flag to avoid build issues:
+# pip install -r requirements.txt --only-binary :all: --prefer-binary
 
 # =============================================================================
 # TIER 1: Market Data & Core Infrastructure
 # =============================================================================
 openbb>=4.5.0                    # Professional market data platform
-duckdb==0.10.3                   # High-performance OLAP database
-sqlalchemy==2.0.30               # Database ORM
+duckdb>=0.10.0                   # High-performance OLAP database
+sqlalchemy>=2.0.0                # Database ORM
 
 # =============================================================================
-# TIER 2: Quantitative Framework & Machine Learning
+# TIER 2: Data Processing & Numerical Computing (CORE)
 # =============================================================================
-qlib==0.9.3                      # Microsoft quantitative investment platform
-lightgbm==4.3.0                  # Gradient boosting for predictions
-xgboost==2.0.3                   # Alternative gradient boosting
-catboost==1.2.5                  # Categorical boosting
-scikit-learn==1.5.0              # ML utilities and preprocessing
-statsmodels==0.14.2              # Statistical modeling
-pykalman==0.9.7                  # Kalman filtering for state estimation
+pandas>=2.2.0                    # Data manipulation and analysis
+numpy>=1.26.0,<2.0.0             # Numerical computing
+scipy>=1.11.0                    # Scientific computing (use binary wheel)
+pyarrow>=16.0.0                  # Columnar data format
 
 # =============================================================================
-# TIER 3: Reinforcement Learning & Deep Learning
+# TIER 3: Data Validation & Configuration
 # =============================================================================
-tensortrade==1.0.3               # RL environment for trading
-stable-baselines3==2.3.2         # RL algorithms (PPO, A2C, DQN)
-torch==2.3.1                     # PyTorch deep learning framework
-gymnasium==0.29.1                # OpenAI Gym API for RL environments
-tensorboard==2.16.2              # Training visualization
+pandera>=0.19.0                  # Data validation for pandas DataFrames
+pydantic>=2.7.0                  # Data validation using Python type hints
+pydantic-settings>=2.3.0         # Settings management with Pydantic
+pyyaml>=6.0.0                    # YAML configuration files
+python-dotenv>=1.0.0             # Environment variable management
 
 # =============================================================================
-# TIER 4: Trading Execution & Market Access
+# TIER 4: Logging & Utilities
 # =============================================================================
-kiteconnect==4.2.0               # Zerodha Kite Connect API
-requests==2.32.3                 # HTTP library for API calls
-websocket-client==1.8.0          # WebSocket for real-time data
-python-dotenv==1.0.1             # Environment variable management
+loguru>=0.7.0                    # Modern logging library
+tqdm>=4.66.0                     # Progress bars
+python-dateutil>=2.9.0           # Date/time utilities
+pytz>=2024.1                     # Timezone definitions
+holidays>=0.52                   # Holiday calendar (includes India)
 
 # =============================================================================
-# TIER 5: Data Processing & Numerical Computing
+# TIER 5: Machine Learning (Core)
 # =============================================================================
-pandas==2.2.2                    # Data manipulation and analysis
-numpy==1.26.4                    # Numerical computing
-scipy==1.13.1                    # Scientific computing
-numba==0.59.1                    # JIT compilation for performance
-polars==0.20.31                  # Fast DataFrame library (alternative to pandas)
-pyarrow==16.1.0                  # Columnar data format
-fastparquet==2024.5.0            # Fast Parquet file I/O
+scikit-learn>=1.5.0              # ML utilities and preprocessing
+lightgbm>=4.0.0                  # Gradient boosting
+xgboost>=2.0.0                   # Alternative gradient boosting
 
 # =============================================================================
-# TIER 6: Technical Analysis & Financial Calculations
+# TIER 6: Trading Execution
 # =============================================================================
-ta-lib==0.4.28                   # Technical analysis library (requires C library)
-pandas-ta==0.3.14b               # Pandas Technical Analysis
-quantlib==1.34                   # Quantitative finance library
-empyrical==0.5.5                 # Financial performance metrics
-pandera==0.19.3                  # Data validation for pandas DataFrames
+kiteconnect>=4.0.0               # Zerodha Kite Connect API
+requests>=2.32.0                 # HTTP library for API calls
+websocket-client>=1.8.0          # WebSocket for real-time data
 
 # =============================================================================
-# TIER 7: Time Series & Statistical Analysis
+# TIER 7: Technical Analysis & Time Series
 # =============================================================================
-arch==6.3.0                      # ARCH/GARCH models for volatility
-hmmlearn==0.3.2                  # Hidden Markov Models for regime detection
-tslearn==0.6.3                   # Time series machine learning
-tsfresh==0.20.2                  # Automated feature extraction from time series
+pandas-ta>=0.3.14b               # Pandas Technical Analysis
+statsmodels>=0.14.0              # Statistical modeling
+arch>=6.3.0                      # ARCH/GARCH models for volatility
+hmmlearn>=0.3.0                  # Hidden Markov Models for regime detection
 
 # =============================================================================
-# TIER 8: Optimization & Risk Management
+# TIER 8: Optimization & Portfolio Management
 # =============================================================================
-cvxpy==1.5.2                     # Convex optimization for portfolio optimization
-scipy-optimize==1.13.1           # Optimization algorithms
-pyportfolioopt==1.5.5            # Portfolio optimization
-riskfolio-lib==6.1.1             # Portfolio optimization and risk analysis
+cvxpy>=1.5.0                     # Convex optimization
+pyportfolioopt>=1.5.0            # Portfolio optimization
 
 # =============================================================================
-# TIER 9: Data Visualization & Reporting
+# TIER 9: Data Visualization
 # =============================================================================
-matplotlib==3.9.0                # Plotting library
-seaborn==0.13.2                  # Statistical data visualization
-plotly==5.22.0                   # Interactive visualizations
-mplfinance==0.12.10b0            # Financial charting
+matplotlib>=3.9.0                # Plotting library
+seaborn>=0.13.0                  # Statistical data visualization
+plotly>=5.22.0                   # Interactive visualizations
 
 # =============================================================================
-# TIER 10: Configuration & Data Validation
+# TIER 10: Testing & Quality Assurance
 # =============================================================================
-pyyaml==6.0.1                    # YAML configuration files
-pydantic==2.7.3                  # Data validation using Python type hints
-pydantic-settings==2.3.0         # Settings management with Pydantic
-jsonschema==4.22.0               # JSON schema validation
+pytest>=8.2.0                    # Testing framework
+pytest-cov>=5.0.0                # Coverage reporting
+pytest-asyncio>=0.23.0           # Async test support
+pytest-mock>=3.14.0              # Mocking for tests
 
 # =============================================================================
-# TIER 11: Logging & Monitoring
+# TIER 11: Code Quality & Development Tools
 # =============================================================================
-loguru==0.7.2                    # Modern logging library
-structlog==24.2.0                # Structured logging
-prometheus-client==0.20.0        # Metrics collection for monitoring
-psutil==5.9.8                    # System and process utilities
+black>=24.4.0                    # Code formatting
+isort>=5.13.0                    # Import sorting
+flake8>=7.0.0                    # Linting
+mypy>=1.10.0                     # Static type checking
 
 # =============================================================================
-# TIER 12: Testing & Quality Assurance
+# TIER 12: Jupyter & Interactive Development
 # =============================================================================
-pytest==8.2.1                    # Testing framework
-pytest-cov==5.0.0                # Coverage reporting
-pytest-asyncio==0.23.7           # Async test support
-pytest-mock==3.14.0              # Mocking for tests
-pytest-benchmark==4.0.0          # Performance benchmarking
-hypothesis==6.103.1              # Property-based testing
+jupyter>=1.0.0                   # Jupyter notebook
+jupyterlab>=4.2.0                # JupyterLab interface
+ipython>=8.25.0                  # Enhanced Python shell
+ipywidgets>=8.1.0                # Interactive widgets for notebooks
 
 # =============================================================================
-# TIER 13: Code Quality & Development Tools
+# Installation Instructions
 # =============================================================================
-black==24.4.2                    # Code formatting
-isort==5.13.2                    # Import sorting
-flake8==7.0.0                    # Linting
-mypy==1.10.0                     # Static type checking
-pylint==3.2.2                    # Code analysis
-pre-commit==3.7.1                # Git hooks for quality checks
-bandit==1.7.8                    # Security linting
-
+# For macOS (especially Apple Silicon M1/M2/M3):
+# 
+# Option 1 (RECOMMENDED): Install with binary wheels only
+# pip install -r requirements.txt --prefer-binary
+#
+# Option 2: If scipy still fails, install it first via conda:
+# conda install scipy numpy pandas scikit-learn
+# pip install -r requirements.txt --no-deps  # then install rest
+#
+# Option 3: Use minimal requirements (most reliable):
+# pip install -r requirements-minimal.txt
+# Then add packages individually as needed
+#
 # =============================================================================
-# TIER 14: Documentation
+# Troubleshooting SciPy Build Issues on macOS
 # =============================================================================
-sphinx==7.3.7                    # Documentation generation
-sphinx-rtd-theme==2.0.0          # Read the Docs theme
-sphinx-autodoc-typehints==2.1.0  # Type hints in documentation
-
+# If you get "Unknown compiler(s): gfortran" error:
+# 
+# Solution 1: Upgrade pip and use binary wheels
+# pip install --upgrade pip setuptools wheel
+# pip install scipy --only-binary scipy
+# pip install -r requirements.txt --prefer-binary
+#
+# Solution 2: Use Homebrew Python (not recommended)
+# brew install python@3.11 gcc gfortran
+#
+# Solution 3: Use Conda (recommended for scientific packages)
+# conda install -c conda-forge scipy numpy pandas scikit-learn
+#
 # =============================================================================
-# TIER 15: Jupyter & Interactive Development
-# =============================================================================
-jupyter==1.0.0                   # Jupyter notebook
-jupyterlab==4.2.1                # JupyterLab interface
-ipython==8.25.0                  # Enhanced Python shell
-ipywidgets==8.1.3                # Interactive widgets for notebooks
-
-# =============================================================================
-# TIER 16: Scheduling & Task Management
-# =============================================================================
-schedule==1.2.1                  # Job scheduling
-apscheduler==3.10.4              # Advanced Python scheduler
-croniter==2.0.5                  # Cron expressions for scheduling
-
-# =============================================================================
-# TIER 17: Utilities & Helpers
-# =============================================================================
-tqdm==4.66.4                     # Progress bars
-python-dateutil==2.9.0.post0     # Date/time utilities
-pytz==2024.1                     # Timezone definitions
-holidays==0.52                   # Holiday calendar (includes India)
-exchange-calendars==4.5.4        # Trading calendar library
-typing-extensions==4.11.0        # Typing extensions for older Python
-
-# =============================================================================
-# TIER 18: API & Web Framework (for dashboards)
-# =============================================================================
-fastapi==0.111.0                 # Modern web framework
-uvicorn==0.30.1                  # ASGI server
-streamlit==1.35.0                # Quick dashboard creation
-dash==2.17.0                     # Plotly Dash for analytics dashboards
-
-# =============================================================================
-# TIER 19: Database & Caching
-# =============================================================================
-redis==5.0.4                     # Redis client for caching
-aioredis==2.0.1                  # Async Redis client
-pymongo==4.7.2                   # MongoDB driver (for storing trades)
-
-# =============================================================================
-# TIER 20: Performance & Profiling
-# =============================================================================
-line-profiler==4.1.3             # Line-by-line profiling
-memory-profiler==0.61.0          # Memory usage profiling
-py-spy==0.3.14                   # Sampling profiler
-
-# =============================================================================
-# Additional Dependencies
-# =============================================================================
-# Note: Some packages may have additional system-level dependencies:
-# - TA-Lib requires: sudo apt-get install ta-lib (Linux) or brew install ta-lib (macOS)
-# - Some OpenBB providers may require additional API keys
-

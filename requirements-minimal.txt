@@ -1,29 +1,42 @@
 # Minimal Requirements for Data Pipeline Testing
 # Install this first to test the data pipeline quickly
+# Installation: pip install -r requirements-minimal.txt
 
-# Core dependencies
-openbb>=4.5.0
-pandas>=2.2.2
-numpy>=1.26.4
-duckdb>=0.10.3
+# =============================================================================
+# Core Data & Market Access
+# =============================================================================
+openbb>=4.5.0                    # Market data platform
+pandas>=2.2.0                    # Data manipulation
+numpy>=1.26.0,<2.0.0             # Numerical computing
+duckdb>=0.10.0                   # Database storage
 
-# Data validation
-pandera>=0.19.3
+# =============================================================================
+# Data Validation & Configuration
+# =============================================================================
+pandera>=0.19.0                  # Data validation
+pydantic>=2.7.0                  # Settings validation
+pydantic-settings>=2.3.0         # Settings management
+pyyaml>=6.0.0                    # YAML config files
+python-dotenv>=1.0.0             # Environment variables
 
-# Utilities
-pydantic>=2.7.3
-pydantic-settings>=2.3.0
-pyyaml>=6.0.1
-python-dotenv>=1.0.1
-loguru>=0.7.2
-tqdm>=4.66.4
+# =============================================================================
+# Logging & Utilities
+# =============================================================================
+loguru>=0.7.0                    # Logging
+tqdm>=4.66.0                     # Progress bars
+python-dateutil>=2.9.0           # Date utilities
+pytz>=2024.1                     # Timezone support
+holidays>=0.52                   # Holiday calendar
 
-# Date/time
-python-dateutil>=2.9.0
-pytz>=2024.1
-holidays>=0.52
+# =============================================================================
+# Testing (Optional but recommended)
+# =============================================================================
+pytest>=8.2.0                    # Testing framework
+pytest-cov>=5.0.0                # Coverage reporting
 
-# Testing (optional for now)
-pytest>=8.2.1
-pytest-cov>=5.0.0
-
+# =============================================================================
+# Installation Instructions
+# =============================================================================
+# 1. Install: pip install -r requirements-minimal.txt
+# 2. Test: python -c "from src.data_pipeline import DataPipeline; print('✅ Success!')"
+# 3. Run: python scripts/setup_data_pipeline.py --symbols "RELIANCE" --years 1
