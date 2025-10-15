@@ -1,0 +1,317 @@
+# Qlib Model Training and Backtesting Configuration
+# Complete configuration for ML-based alpha generation
+
+# =============================================================================
+# MODEL TRAINING PARAMETERS
+# =============================================================================
+training:
+  # Model type: 'lightgbm' or 'xgboost'
+  model_type: lightgbm
+  
+  # Forward prediction horizon (days)
+  forward_horizon: 5
+  
+  # Data split ratios (must sum to < 1.0)
+  train_ratio: 0.6
+  valid_ratio: 0.2
+  # test_ratio is implicit: 1.0 - train_ratio - valid_ratio
+  
+  # Early stopping
+  early_stopping_rounds: 50
+  
+  # Random seed for reproducibility
+  random_state: 42
+
+# =============================================================================
+# LIGHTGBM HYPERPARAMETERS
+# =============================================================================
+lightgbm:
+  objective: regression
+  metric: mse
+  boosting_type: gbdt
+  num_leaves: 31
+  learning_rate: 0.05
+  n_estimators: 1000
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  bagging_freq: 5
+  max_depth: -1
+  min_child_samples: 20
+  verbose: -1
+  
+# =============================================================================
+# XGBOOST HYPERPARAMETERS
+# =============================================================================
+xgboost:
+  objective: reg:squarederror
+  eval_metric: rmse
+  max_depth: 6
+  learning_rate: 0.05
+  n_estimators: 1000
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 1
+  verbosity: 0
+
+# =============================================================================
+# SIGNAL GENERATION SETTINGS
+# =============================================================================
+signals:
+  # Method for ranking: 'percentile', 'zscore', or 'minmax'
+  ranking_method: percentile
+  
+  # Long/short portfolio construction
+  long_pct: 0.2    # Top 20% for long
+  short_pct: 0.2   # Bottom 20% for short
+  
+  # Fixed number of positions (overrides percentiles if set)
+  n_long: null
+  n_short: null
+  
+  # Signal combination (if using multiple models)
+  combination_method: equal_weight  # 'equal_weight' or 'performance_weighted'
+
+# =============================================================================
+# PORTFOLIO OPTIMIZATION PARAMETERS
+# =============================================================================
+portfolio:
+  # Optimization method: 'mean_variance', 'max_sharpe', 'risk_parity', 'min_variance'
+  optimization_method: mean_variance
+  
+  # Risk aversion parameter (for mean-variance)
+  risk_aversion: 1.0
+  
+  # Risk-free rate (annual)
+  risk_free_rate: 0.05
+  
+  # Constraints
+  constraints:
+    long_only: false           # Allow short positions
+    max_position: 0.1          # Max 10% per position
+    max_leverage: 1.0          # Max total leverage
+    min_position: 0.01         # Min position size (to reduce costs)
+  
+  # Covariance estimation
+  covariance:
+    method: sample             # 'sample', 'ledoit_wolf', or 'shrinkage'
+    lookback_days: 60          # Days for covariance estimation
+    min_periods: 30            # Minimum periods required
+
+# =============================================================================
+# BACKTESTING SETTINGS
+# =============================================================================
+backtesting:
+  # Initial capital (INR)
+  initial_capital: 1000000
+  
+  # Transaction costs
+  commission: 0.001            # 0.1% per trade
+  slippage: 0.0005            # 0.05% slippage
+  
+  # Rebalancing frequency: 'daily', 'weekly', 'monthly'
+  rebalance_freq: daily
+  
+  # Execution timing
+  execution_delay: 1           # Days between signal and execution
+  
+  # Position limits
+  max_positions: 50            # Maximum number of positions
+  
+  # Minimum holding period (days)
+  min_holding_period: 1
+
+# =============================================================================
+# PERFORMANCE ANALYSIS OPTIONS
+# =============================================================================
+performance:
+  # Annual risk-free rate for Sharpe/Sortino
+  risk_free_rate: 0.05
+  
+  # Benchmark for comparison (optional)
+  benchmark: NIFTY50
+  
+  # Metrics to calculate
+  metrics:
+    - total_return
+    - annualized_return
+    - cagr
+    - volatility
+    - sharpe_ratio
+    - sortino_ratio
+    - calmar_ratio
+    - max_drawdown
+    - win_rate
+  
+  # Drawdown analysis
+  drawdown:
+    top_n: 10                  # Number of top drawdowns to report
+    include_recovery: true     # Track recovery dates
+  
+  # Attribution analysis
+  attribution:
+    enabled: true
+    by_regime: true
+    by_sector: false
+    by_factor: false
+
+# =============================================================================
+# REGIME-SPECIFIC CONFIGURATIONS
+# =============================================================================
+regime_adaptive:
+  # Enable regime-adaptive strategy
+  enabled: true
+  
+  # Regime detection method: 'wasserstein' or 'hmm'
+  detection_method: wasserstein
+  
+  # Number of regimes
+  n_regimes: 4
+  
+  # Regime-specific parameters
+  regimes:
+    # Regime 0: Bull Market
+    bull:
+      long_pct: 0.3
+      short_pct: 0.1
+      max_position: 0.1
+      rebalance_freq: weekly
+      risk_aversion: 0.5
+      optimization_method: max_sharpe
+    
+    # Regime 1: Bear Market
+    bear:
+      long_pct: 0.1
+      short_pct: 0.3
+      max_position: 0.08
+      rebalance_freq: daily
+      risk_aversion: 2.0
+      optimization_method: min_variance
+    
+    # Regime 2: High Volatility
+    high_volatility:
+      long_pct: 0.15
+      short_pct: 0.15
+      max_position: 0.05
+      rebalance_freq: daily
+      risk_aversion: 3.0
+      optimization_method: risk_parity
+    
+    # Regime 3: Crash
+    crash:
+      long_pct: 0.05
+      short_pct: 0.05
+      max_position: 0.03
+      rebalance_freq: daily
+      risk_aversion: 5.0
+      optimization_method: min_variance
+
+# =============================================================================
+# DATA SETTINGS
+# =============================================================================
+data:
+  # Database path
+  db_path: data/trading_db.duckdb
+  
+  # Symbol universe
+  universe: NIFTY50
+  
+  # Factor selection (if not using all 158)
+  factor_selection:
+    enabled: false
+    method: importance        # 'importance', 'correlation', or 'pca'
+    top_n: 100               # Number of factors to select
+  
+  # Data quality filters
+  filters:
+    min_price: 10            # Minimum price (INR)
+    min_volume: 100000       # Minimum daily volume
+    max_missing_pct: 0.1     # Max 10% missing data
+
+# =============================================================================
+# MODEL PERSISTENCE
+# =============================================================================
+models:
+  # Output directory
+  save_dir: models
+  
+  # Model naming convention
+  name_format: "{model_type}_{regime}_{horizon}day_{timestamp}"
+  
+  # Model versioning
+  versioning:
+    enabled: true
+    keep_last_n: 5           # Keep last 5 versions
+  
+  # Metadata to save
+  metadata:
+    - training_date
+    - hyperparameters
+    - performance_metrics
+    - feature_importance
+    - data_period
+    - regime_info
+
+# =============================================================================
+# REPORTING
+# =============================================================================
+reporting:
+  # Output directory
+  output_dir: reports
+  
+  # Report formats
+  formats:
+    - csv
+    - json
+    - html
+  
+  # Visualization
+  plots:
+    - equity_curve
+    - drawdown_chart
+    - returns_distribution
+    - regime_overlay
+    - factor_importance
+  
+  # Summary statistics
+  summary:
+    include_regime_breakdown: true
+    include_monthly_returns: true
+    include_trade_analysis: true
+
+# =============================================================================
+# EXECUTION SETTINGS (for live trading)
+# =============================================================================
+execution:
+  # Execution mode: 'paper' or 'live'
+  mode: paper
+  
+  # Order types
+  order_type: limit            # 'market' or 'limit'
+  limit_price_offset: 0.001    # Offset for limit orders
+  
+  # Risk controls
+  max_daily_loss: 0.02         # Max 2% daily loss
+  max_position_value: 100000   # Max position value (INR)
+  
+  # Monitoring
+  monitoring:
+    check_interval: 60         # Seconds between checks
+    alert_on_fill: true
+    alert_on_reject: true
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: INFO
+  
+  # Log files
+  files:
+    training: logs/model_training.log
+    backtesting: logs/backtesting.log
+    execution: logs/execution.log
+  
+  # Rotation
+  rotation: 10 MB
+  retention: 30 days
+

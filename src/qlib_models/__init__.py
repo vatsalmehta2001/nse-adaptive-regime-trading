@@ -12,12 +12,9 @@ from typing import List
 
 __all__: List[str] = [
     "QlibModelTrainer",
-    "QlibPredictor",
-    "QlibStrategy",
+    "AlphaSignalGenerator",
 ]
 
-# Import main classes when they are implemented
-# from src.qlib_models.trainer import QlibModelTrainer
-# from src.qlib_models.predictor import QlibPredictor
-# from src.qlib_models.strategy import QlibStrategy
+from src.qlib_models.model_trainer import QlibModelTrainer
+from src.qlib_models.signal_generator import AlphaSignalGenerator
 
