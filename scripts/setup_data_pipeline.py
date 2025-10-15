@@ -103,7 +103,7 @@ def setup_data_pipeline(
         logger.info(f"Date range: {db_stats.get('min_date', 'N/A')} to {db_stats.get('max_date', 'N/A')}")
 
         logger.info("\n" + "=" * 80)
-        logger.info("✅ Setup complete! Data pipeline is ready.")
+        logger.info(" Setup complete! Data pipeline is ready.")
         logger.info("=" * 80)
 
     except KeyboardInterrupt:

@@ -178,24 +178,24 @@ make notebook
 
 ```
 nse-adaptive-regime-trading/
-├── config/                  # Configuration files (YAML)
-├── data/                    # Data storage (gitignored)
-├── docs/                    # Documentation
-├── logs/                    # Log files (gitignored)
-├── models/                  # Trained models (gitignored)
-├── notebooks/               # Jupyter notebooks
-├── scripts/                 # Utility scripts
-├── src/                     # Source code
-│   ├── data_pipeline/       # Data acquisition
-│   ├── feature_engineering/ # Feature generation
-│   ├── regime_detection/    # Regime identification
-│   ├── qlib_models/         # Qlib models
-│   ├── rl_strategy/         # RL agents
-│   ├── risk_management/     # Risk controls
-│   ├── execution/           # Order execution
-│   ├── backtesting/         # Backtesting engine
-│   └── utils/               # Utilities
-└── tests/                   # Test suite
+ config/                  # Configuration files (YAML)
+ data/                    # Data storage (gitignored)
+ docs/                    # Documentation
+ logs/                    # Log files (gitignored)
+ models/                  # Trained models (gitignored)
+ notebooks/               # Jupyter notebooks
+ scripts/                 # Utility scripts
+ src/                     # Source code
+    data_pipeline/       # Data acquisition
+    feature_engineering/ # Feature generation
+    regime_detection/    # Regime identification
+    qlib_models/         # Qlib models
+    rl_strategy/         # RL agents
+    risk_management/     # Risk controls
+    execution/           # Order execution
+    backtesting/         # Backtesting engine
+    utils/               # Utilities
+ tests/                   # Test suite
 ```
 
 ## Configuration
@@ -310,7 +310,7 @@ python -c "from src.utils.database import get_database; get_database().initializ
 
 ## Safety Reminders
 
-⚠️ **Important Safety Guidelines**:
+ **Important Safety Guidelines**:
 
 1. Always test in paper trading mode first
 2. Start with small position sizes
@@ -327,5 +327,5 @@ python -c "from src.utils.database import get_database; get_database().initializ
 - Issues: GitHub Issues
 - Email: your.email@example.com
 
-Happy Trading! 🚀📈
+Happy Trading! 
 

@@ -1,4 +1,4 @@
-# 🚀 NSE Adaptive Regime Trading System
+# NSE Adaptive Regime Trading System
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -7,7 +7,7 @@
 
 A production-grade algorithmic trading system for the National Stock Exchange of India (NSE) that combines institutional-level quantitative research with reinforcement learning for adaptive strategy optimization.
 
-## 🎯 Overview
+## Overview
 
 This system integrates four professional-grade technologies to create a complete quantitative trading pipeline:
 
@@ -18,29 +18,29 @@ This system integrates four professional-grade technologies to create a complete
 
 ### Key Features
 
-✅ **Data Pipeline**: Professional market data with OpenBB Platform + DuckDB (✅ OPERATIONAL)  
-✅ **Alpha-158 Factors**: Qlib's 158 institutional-grade alpha factors (✅ IMPLEMENTED)  
-✅ **Regime Detection**: Wasserstein distance + HMM regime identification (✅ IMPLEMENTED)  
-✅ **Feature Store**: Efficient DuckDB storage for factors and regimes (✅ OPERATIONAL)  
-✅ **Factor Analysis**: IC calculation, correlation, VIF analysis (✅ IMPLEMENTED)  
-✅ **Adaptive Learning**: RL agents (PPO, A2C, DQN) for strategy optimization  
-✅ **Risk Management**: Real-time position sizing and portfolio risk controls  
-✅ **Live Execution**: Automated order placement via Zerodha Kite Connect  
-✅ **Backtesting**: Transaction cost models, slippage simulation, performance analytics  
+ **Data Pipeline**: Professional market data with OpenBB Platform + DuckDB ( OPERATIONAL)  
+ **Alpha-158 Factors**: Qlib's 158 institutional-grade alpha factors ( IMPLEMENTED)  
+ **Regime Detection**: Wasserstein distance + HMM regime identification ( IMPLEMENTED)  
+ **Feature Store**: Efficient DuckDB storage for factors and regimes ( OPERATIONAL)  
+ **Factor Analysis**: IC calculation, correlation, VIF analysis ( IMPLEMENTED)  
+ **Adaptive Learning**: RL agents (PPO, A2C, DQN) for strategy optimization  
+ **Risk Management**: Real-time position sizing and portfolio risk controls  
+ **Live Execution**: Automated order placement via Zerodha Kite Connect  
+ **Backtesting**: Transaction cost models, slippage simulation, performance analytics  
 
-### ✨ Latest Updates
+### Latest Updates
 
-**🎉 Qlib Alpha-158 & Regime Detection - COMPLETE!**
-- ✅ **158 institutional-grade alpha factors** (verified)
-- ✅ **Wasserstein regime detection** (4 regimes: bull/bear/highvol/crash)
-- ✅ **Factor analysis toolkit** (IC, correlation, VIF)
-- ✅ **Regime-aware feature engineering** (~244 total features)
-- ✅ **Production-ready** (all core tests passed)
+**Qlib Alpha-158 & Regime Detection - COMPLETE**
+-  **158 institutional-grade alpha factors** (verified)
+-  **Wasserstein regime detection** (4 regimes: bull/bear/highvol/crash)
+-  **Factor analysis toolkit** (IC, correlation, VIF)
+-  **Regime-aware feature engineering** (~244 total features)
+-  **Production-ready** (all core tests passed)
 
 **Performance:** 164x faster than target (0.03s vs 5s for 500 days)  
 **See:** `QLIB_QUICK_START.md` for complete guide  
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -99,7 +99,7 @@ This system integrates four professional-grade technologies to create a complete
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -178,7 +178,7 @@ python scripts/run_live_trading.py --mode paper
 python scripts/run_live_trading.py --mode live --confirm
 ```
 
-## 📊 Technology Stack
+##  Technology Stack
 
 ### Data & Infrastructure
 - **OpenBB Platform** (4.2.4): Multi-source market data aggregation
@@ -205,7 +205,7 @@ python scripts/run_live_trading.py --mode live --confirm
 - **pytest** (8.2.1): Testing framework
 - **Loguru** (0.7.2): Structured logging
 
-## 📈 Performance Metrics (Placeholder)
+##  Performance Metrics (Placeholder)
 
 > **Note**: The following metrics will be updated with live system performance
 
@@ -227,55 +227,55 @@ python scripts/run_live_trading.py --mode live --confirm
 | Avg Trade Duration | TBD |
 | Current Drawdown | TBD |
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 nse-adaptive-regime-trading/
-├── config/                     # Configuration files
-│   ├── data_sources.yaml       # OpenBB and data provider settings
-│   ├── qlib_config.yaml        # Qlib model configuration
-│   ├── tensortrade_config.yaml # RL agent hyperparameters
-│   ├── zerodha_config.yaml     # Kite Connect settings
-│   └── trading_rules.yaml      # Risk management rules
-├── data/                       # Data storage (gitignored)
-│   ├── raw/                    # Raw market data
-│   ├── processed/              # Cleaned and featured data
-│   └── qlib_data/              # Qlib format data
-├── docs/                       # Documentation
-│   ├── architecture.md         # Detailed architecture
-│   ├── strategy_overview.md    # Trading strategy documentation
-│   └── api_reference.md        # API documentation
-├── notebooks/                  # Jupyter notebooks for research
-│   ├── exploratory/            # EDA notebooks
-│   └── experiments/            # Strategy experiments
-├── scripts/                    # Utility scripts
-│   ├── setup_qlib_data.py      # Initialize Qlib data
-│   ├── train_rl_agent.py       # Train RL models
-│   └── run_backtest.py         # Execute backtests
-├── src/                        # Source code
-│   ├── data_pipeline/          # Data acquisition and processing
-│   ├── feature_engineering/    # Feature generation
-│   ├── regime_detection/       # Market regime identification
-│   ├── qlib_models/            # Qlib model implementations
-│   ├── rl_strategy/            # RL agent training and inference
-│   ├── risk_management/        # Position sizing and risk controls
-│   ├── execution/              # Order execution and Kite integration
-│   ├── backtesting/            # Backtesting engine
-│   └── utils/                  # Shared utilities
-├── tests/                      # Test suite
-│   ├── unit/                   # Unit tests
-│   ├── integration/            # Integration tests
-│   └── performance/            # Performance benchmarks
-├── .env.example                # Environment variable template
-├── .gitignore                  # Git ignore rules
-├── LICENSE                     # MIT License
-├── pyproject.toml              # Modern Python packaging
-├── requirements.txt            # Python dependencies
-├── setup.py                    # Package installation
-└── README.md                   # This file
+ config/                     # Configuration files
+    data_sources.yaml       # OpenBB and data provider settings
+    qlib_config.yaml        # Qlib model configuration
+    tensortrade_config.yaml # RL agent hyperparameters
+    zerodha_config.yaml     # Kite Connect settings
+    trading_rules.yaml      # Risk management rules
+ data/                       # Data storage (gitignored)
+    raw/                    # Raw market data
+    processed/              # Cleaned and featured data
+    qlib_data/              # Qlib format data
+ docs/                       # Documentation
+    architecture.md         # Detailed architecture
+    strategy_overview.md    # Trading strategy documentation
+    api_reference.md        # API documentation
+ notebooks/                  # Jupyter notebooks for research
+    exploratory/            # EDA notebooks
+    experiments/            # Strategy experiments
+ scripts/                    # Utility scripts
+    setup_qlib_data.py      # Initialize Qlib data
+    train_rl_agent.py       # Train RL models
+    run_backtest.py         # Execute backtests
+ src/                        # Source code
+    data_pipeline/          # Data acquisition and processing
+    feature_engineering/    # Feature generation
+    regime_detection/       # Market regime identification
+    qlib_models/            # Qlib model implementations
+    rl_strategy/            # RL agent training and inference
+    risk_management/        # Position sizing and risk controls
+    execution/              # Order execution and Kite integration
+    backtesting/            # Backtesting engine
+    utils/                  # Shared utilities
+ tests/                      # Test suite
+    unit/                   # Unit tests
+    integration/            # Integration tests
+    performance/            # Performance benchmarks
+ .env.example                # Environment variable template
+ .gitignore                  # Git ignore rules
+ LICENSE                     # MIT License
+ pyproject.toml              # Modern Python packaging
+ requirements.txt            # Python dependencies
+ setup.py                    # Package installation
+ README.md                   # This file
 ```
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Run all tests
@@ -296,7 +296,7 @@ mypy src/
 black src/ tests/ scripts/
 ```
 
-## 📚 Documentation
+##  Documentation
 
 Detailed documentation is available in the `docs/` directory:
 
@@ -304,7 +304,7 @@ Detailed documentation is available in the `docs/` directory:
 - [Strategy Overview](docs/strategy_overview.md)
 - [API Reference](docs/api_reference.md)
 
-## 🤝 Contributing
+##  Contributing
 
 This is a personal portfolio project. If you'd like to suggest improvements:
 
@@ -314,7 +314,7 @@ This is a personal portfolio project. If you'd like to suggest improvements:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## ⚠️ Risk Disclaimer
+##  Risk Disclaimer
 
 **IMPORTANT**: This software is for educational and research purposes only.
 
@@ -327,11 +327,11 @@ This is a personal portfolio project. If you'd like to suggest improvements:
 
 Past performance is not indicative of future results. The developers assume no liability for financial losses incurred through the use of this software.
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Microsoft Qlib Team**: For the excellent quantitative investment framework
 - **OpenBB**: For democratizing financial data access
@@ -339,7 +339,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Zerodha**: For providing robust API access to Indian markets
 - **Python Quant Community**: For the amazing ecosystem of tools
 
-## 📧 Contact
+##  Contact
 
 For questions or collaboration opportunities:
 - GitHub: [@yourusername](https://github.com/yourusername)
@@ -348,4 +348,4 @@ For questions or collaboration opportunities:
 
 ---
 
-**Built with ❤️ for the quantitative trading community**
+**Built with  for the quantitative trading community**

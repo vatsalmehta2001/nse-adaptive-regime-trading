@@ -105,7 +105,7 @@ class RegimeFeatureEngineer:
                 )
                 factors = pd.concat([factors, interactions], axis=1)
         
-        logger.info(f"✅ Generated {len(factors.columns)} total features")
+        logger.info(f" Generated {len(factors.columns)} total features")
         
         return factors
     

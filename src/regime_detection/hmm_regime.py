@@ -102,7 +102,7 @@ class HMMRegimeDetector:
         self._characterize_regimes(data, regime_labels, X.index)
         
         self._fitted = True
-        logger.info("✅ GMM regime detector fitted successfully")
+        logger.info(" GMM regime detector fitted successfully")
         
         return self
     

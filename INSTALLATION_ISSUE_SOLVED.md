@@ -1,6 +1,6 @@
-# 🔧 SciPy Installation Issue - SOLVED
+#  SciPy Installation Issue - SOLVED
 
-## ❌ The Problem You Encountered
+##  The Problem You Encountered
 
 When running `pip install -r requirements.txt`, you got:
 
@@ -13,9 +13,9 @@ Running `gfortran --help` gave "[Errno 2] No such file or directory: 'gfortran'"
 
 ---
 
-## ✅ The Solution (3 Options)
+##  The Solution (3 Options)
 
-### **Option 1: Use Binary Wheels (RECOMMENDED)** ⭐
+### **Option 1: Use Binary Wheels (RECOMMENDED)** 
 
 Upgrade pip and force binary installation:
 
@@ -37,7 +37,7 @@ pip install scipy --only-binary scipy
 pip install -r requirements.txt --prefer-binary
 ```
 
-### **Option 3: Use requirements-minimal.txt (SAFEST)** ⭐⭐⭐
+### **Option 3: Use requirements-minimal.txt (SAFEST)** 
 
 ```bash
 # This one WORKS - you already have it installed!
@@ -51,24 +51,24 @@ pip install jupyter --prefer-binary
 
 ---
 
-## 🎯 **ANSWER TO YOUR QUESTION**
+##  **ANSWER TO YOUR QUESTION**
 
-### ❓ "Can I delete requirements-minimal.txt now?"
+###  "Can I delete requirements-minimal.txt now?"
 
-### **NO! KEEP IT!** ❌🗑️
+### **NO! KEEP IT!** 
 
 Here's why:
 
 | File | Status | Purpose |
 |------|--------|---------|
-| **requirements-minimal.txt** | ✅ **WORKING** | Core data pipeline (reliable, tested) |
-| **requirements.txt** | ⚠️ **Needs special install** | Full system (may need binary wheels) |
+| **requirements-minimal.txt** |  **WORKING** | Core data pipeline (reliable, tested) |
+| **requirements.txt** |  **Needs special install** | Full system (may need binary wheels) |
 
 **requirements-minimal.txt is your safety net!** It:
-- ✅ Works perfectly on your system
-- ✅ Has everything needed for the data pipeline
-- ✅ Avoids problematic packages
-- ✅ Installs in < 2 minutes
+-  Works perfectly on your system
+-  Has everything needed for the data pipeline
+-  Avoids problematic packages
+-  Installs in < 2 minutes
 
 **requirements.txt** should be used:
 - Only when you need advanced features
@@ -77,29 +77,29 @@ Here's why:
 
 ---
 
-## 📋 **What Each File Does**
+##  **What Each File Does**
 
 ### **requirements-minimal.txt** (Keep This!)
 ```
-✅ OpenBB - Market data
-✅ DuckDB - Storage
-✅ Pandas/NumPy - Data processing
-✅ Pandera - Validation
-✅ Loguru - Logging
-✅ PyTest - Testing
+ OpenBB - Market data
+ DuckDB - Storage
+ Pandas/NumPy - Data processing
+ Pandera - Validation
+ Loguru - Logging
+ PyTest - Testing
 
 Total: ~12 core packages
-Status: WORKING ✅
+Status: WORKING 
 ```
 
 ### **requirements.txt** (Use with caution)
 ```
-✅ All of the above PLUS:
-⚠️ SciPy - Scientific computing (needs binary wheel)
-⚠️ Scikit-learn - ML (large package)
-⚠️ Matplotlib - Plotting (large package)
-⚠️ Jupyter - Notebooks (many dependencies)
-⚠️ And ~40+ more packages
+ All of the above PLUS:
+ SciPy - Scientific computing (needs binary wheel)
+ Scikit-learn - ML (large package)
+ Matplotlib - Plotting (large package)
+ Jupyter - Notebooks (many dependencies)
+ And ~40+ more packages
 
 Total: ~50+ packages
 Status: Needs --prefer-binary flag
@@ -107,15 +107,15 @@ Status: Needs --prefer-binary flag
 
 ---
 
-## 🚀 **Recommended Installation Strategy**
+##  **Recommended Installation Strategy**
 
 ### **For Data Pipeline Testing** (Your Current Use Case):
 ```bash
 # You're already set!
-pip install -r requirements-minimal.txt  # Already done ✅
+pip install -r requirements-minimal.txt  # Already done 
 
 # Test it works
-python -c "from src.data_pipeline import DataPipeline; print('✅ Ready!')"
+python -c "from src.data_pipeline import DataPipeline; print(' Ready!')"
 
 # Fetch data
 python scripts/setup_data_pipeline.py --symbols RELIANCE --years 1
@@ -145,7 +145,7 @@ pip install -r requirements.txt --prefer-binary
 
 ---
 
-## 🔍 **Understanding the SciPy Error**
+##  **Understanding the SciPy Error**
 
 ### Why did it happen?
 
@@ -170,22 +170,22 @@ pip install -r requirements.txt --prefer-binary
 
 ---
 
-## ✅ **Current Status of Your System**
+##  **Current Status of Your System**
 
 ```
-✅ requirements-minimal.txt - INSTALLED & WORKING
-✅ Data Pipeline - FULLY FUNCTIONAL  
-✅ OpenBB - Fetching real NSE data
-✅ DuckDB - Storing data
-✅ Validators - Working
-✅ Technical Indicators - Ready
+ requirements-minimal.txt - INSTALLED & WORKING
+ Data Pipeline - FULLY FUNCTIONAL  
+ OpenBB - Fetching real NSE data
+ DuckDB - Storing data
+ Validators - Working
+ Technical Indicators - Ready
 ```
 
 **You can use the system RIGHT NOW!**
 
 ---
 
-## 🎯 **Bottom Line**
+##  **Bottom Line**
 
 1. **KEEP requirements-minimal.txt** ← This is your reliable foundation
 2. **Use requirements.txt** only for advanced features (with --prefer-binary)
@@ -194,7 +194,7 @@ pip install -r requirements.txt --prefer-binary
 
 ---
 
-## 📝 **Quick Commands**
+##  **Quick Commands**
 
 ```bash
 # Current working setup (keep this!)
@@ -213,13 +213,13 @@ pip list | grep -E 'openbb|pandas|duckdb|pandera'
 # Test the system
 python -c "
 from src.data_pipeline import DataPipeline
-print('✅ System is ready!')
+print(' System is ready!')
 "
 ```
 
 ---
 
-## 🆘 **If You Still Get Errors**
+##  **If You Still Get Errors**
 
 ### Error: SciPy won't install
 ```bash
@@ -248,12 +248,12 @@ pip install -r requirements-minimal.txt --no-deps
 
 ---
 
-## 🎉 **Summary**
+##  **Summary**
 
-- ✅ **requirements-minimal.txt** = Your reliable working setup (KEEP IT!)
-- ⚠️ **requirements.txt** = Use with `--prefer-binary` for full features
-- 🚀 **You can start trading development NOW** with minimal requirements
-- 📦 **Add packages incrementally** when you need them
+-  **requirements-minimal.txt** = Your reliable working setup (KEEP IT!)
+-  **requirements.txt** = Use with `--prefer-binary` for full features
+-  **You can start trading development NOW** with minimal requirements
+-  **Add packages incrementally** when you need them
 
-**Don't delete requirements-minimal.txt - it's your safety net!** 🛡️
+**Don't delete requirements-minimal.txt - it's your safety net!** 
 

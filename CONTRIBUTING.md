@@ -242,21 +242,21 @@ Familiarize yourself with the project structure:
 
 ```
 nse-adaptive-regime-trading/
-├── src/                    # Source code
-│   ├── data_pipeline/      # Data acquisition and processing
-│   ├── feature_engineering/# Feature generation
-│   ├── regime_detection/   # Market regime identification
-│   ├── qlib_models/        # Qlib model implementations
-│   ├── rl_strategy/        # RL agent training
-│   ├── risk_management/    # Risk controls
-│   ├── execution/          # Order execution
-│   ├── backtesting/        # Backtesting engine
-│   └── utils/              # Utilities
-├── tests/                  # Test suite
-├── config/                 # Configuration files
-├── scripts/                # Utility scripts
-├── notebooks/              # Jupyter notebooks
-└── docs/                   # Documentation
+ src/                    # Source code
+    data_pipeline/      # Data acquisition and processing
+    feature_engineering/# Feature generation
+    regime_detection/   # Market regime identification
+    qlib_models/        # Qlib model implementations
+    rl_strategy/        # RL agent training
+    risk_management/    # Risk controls
+    execution/          # Order execution
+    backtesting/        # Backtesting engine
+    utils/              # Utilities
+ tests/                  # Test suite
+ config/                 # Configuration files
+ scripts/                # Utility scripts
+ notebooks/              # Jupyter notebooks
+ docs/                   # Documentation
 ```
 
 ## Questions?
@@ -287,5 +287,5 @@ Unacceptable behavior may result in being blocked from the project.
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-Thank you for contributing! 🚀
+Thank you for contributing! 
 

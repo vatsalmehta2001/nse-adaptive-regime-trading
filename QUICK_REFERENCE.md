@@ -1,6 +1,6 @@
 # Data Pipeline Quick Reference
 
-## 🚀 Quick Commands
+##  Quick Commands
 
 ```bash
 # Setup pipeline (fetch 2 years of NIFTY 50)
@@ -16,7 +16,7 @@ pytest tests/unit/test_data_pipeline.py -v
 python -c "from src.data_pipeline import DataPipeline; p = DataPipeline(); print(p.storage.get_database_stats())"
 ```
 
-## 📝 Code Examples
+##  Code Examples
 
 ### Fetch and Store Data
 
@@ -136,7 +136,7 @@ print(f"Symbols: {health['database']['unique_symbols']}")
 print(f"Data age: {health['database'].get('data_age_days', 0)} days")
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 ### Environment Variables
 
@@ -159,7 +159,7 @@ openbb:
     cache_ttl: 3600
 ```
 
-## 📊 Database Queries
+##  Database Queries
 
 ```python
 from src.data_pipeline import DataStorageManager
@@ -182,7 +182,7 @@ print(f"Symbols: {stats['unique_symbols']}")
 print(f"Total rows: {stats['ohlcv_count']}")
 ```
 
-## 🧪 Testing
+##  Testing
 
 ```bash
 # Run all data pipeline tests
@@ -195,7 +195,7 @@ pytest tests/unit/test_data_pipeline.py::TestOpenBBDataFetcher -v
 pytest tests/unit/test_data_pipeline.py --cov=src.data_pipeline
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Check Logs
 
@@ -240,7 +240,7 @@ coverage = pipeline.storage.get_data_coverage("RELIANCE")
 print(coverage)
 ```
 
-## 📈 Performance Tips
+##  Performance Tips
 
 1. **Batch Fetching**: Use `batch_size=10` for optimal performance
 2. **Parallel Workers**: Set `max_workers=3` to avoid rate limits
@@ -248,7 +248,7 @@ print(coverage)
 4. **Incremental Updates**: Use `update_data()` instead of full refetch
 5. **Database Indexes**: Created automatically, no action needed
 
-## 🎯 Common Tasks
+##  Common Tasks
 
 ### Task 1: Setup Fresh Database
 
@@ -304,7 +304,7 @@ df_ml = indicators.generate_all_features(df)
 df_ml.to_parquet("ml_features.parquet")
 ```
 
-## 📚 More Information
+##  More Information
 
 - **Full Documentation**: `DATA_PIPELINE_README.md`
 - **API Reference**: `docs/api_reference.md`

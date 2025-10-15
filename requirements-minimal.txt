@@ -38,5 +38,5 @@ pytest-cov>=5.0.0                # Coverage reporting
 # Installation Instructions
 # =============================================================================
 # 1. Install: pip install -r requirements-minimal.txt
-# 2. Test: python -c "from src.data_pipeline import DataPipeline; print('✅ Success!')"
+# 2. Test: python -c "from src.data_pipeline import DataPipeline; print(' Success!')"
 # 3. Run: python scripts/setup_data_pipeline.py --symbols "RELIANCE" --years 1

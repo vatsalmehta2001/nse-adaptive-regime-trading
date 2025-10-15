@@ -125,7 +125,7 @@ def generate_factors_pipeline(
             stats['symbols_processed'] += 1
             stats['total_factors_stored'] += rows
             
-            logger.info(f"✅ {symbol}: {rows} rows stored")
+            logger.info(f" {symbol}: {rows} rows stored")
             
         except Exception as e:
             logger.error(f"Failed to process {symbol}: {e}", exc_info=True)
@@ -351,14 +351,14 @@ Examples:
     
     # Print summary
     print("\n" + "=" * 80)
-    print("✅ FACTOR GENERATION COMPLETE")
+    print(" FACTOR GENERATION COMPLETE")
     print("=" * 80)
     print(f"Symbols processed: {stats['symbols_processed']}/{len(symbols)}")
     print(f"Total rows stored: {stats['total_factors_stored']:,}")
     if stats['avg_ic']:
         print(f"Average IC: {stats['avg_ic']:.4f}")
     if stats['regimes_detected']:
-        print(f"✅ Market regimes detected and stored")
+        print(f" Market regimes detected and stored")
     print("=" * 80)
 
 

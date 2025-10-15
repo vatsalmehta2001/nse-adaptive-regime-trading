@@ -1,12 +1,12 @@
 # Installation Strategy
 
-## 📦 Smart Installation Approach
+##  Smart Installation Approach
 
 Install packages in stages to avoid conflicts and identify issues early.
 
 ---
 
-## ✅ **Stage 1: Core Data Pipeline (Required)**
+##  **Stage 1: Core Data Pipeline (Required)**
 
 This gets you up and running with the data pipeline:
 
@@ -15,21 +15,21 @@ pip install -r requirements-minimal.txt
 ```
 
 **What you get**:
-- ✅ OpenBB for market data
-- ✅ DuckDB for storage
-- ✅ Pandas/NumPy for data processing
-- ✅ Data validation (Pandera)
-- ✅ Configuration management
-- ✅ Logging and utilities
+-  OpenBB for market data
+-  DuckDB for storage
+-  Pandas/NumPy for data processing
+-  Data validation (Pandera)
+-  Configuration management
+-  Logging and utilities
 
 **Test it**:
 ```bash
-python -c "from src.data_pipeline import DataPipeline; print('✅ Stage 1 Complete!')"
+python -c "from src.data_pipeline import DataPipeline; print(' Stage 1 Complete!')"
 ```
 
 ---
 
-## ✅ **Stage 2: Machine Learning (Optional)**
+##  **Stage 2: Machine Learning (Optional)**
 
 Add ML capabilities for Qlib models:
 
@@ -38,13 +38,13 @@ pip install scikit-learn>=1.5.0 lightgbm>=4.0.0 xgboost>=2.0.0 statsmodels>=0.14
 ```
 
 **What you get**:
-- ✅ Basic ML algorithms
-- ✅ Gradient boosting models
-- ✅ Statistical models
+-  Basic ML algorithms
+-  Gradient boosting models
+-  Statistical models
 
 ---
 
-## ✅ **Stage 3: Technical Analysis (Optional)**
+##  **Stage 3: Technical Analysis (Optional)**
 
 Add technical indicators:
 
@@ -65,7 +65,7 @@ pip install ta-lib
 
 ---
 
-## ✅ **Stage 4: Time Series & Regime Detection (Optional)**
+##  **Stage 4: Time Series & Regime Detection (Optional)**
 
 Add advanced time series analysis:
 
@@ -75,7 +75,7 @@ pip install arch>=6.3.0 hmmlearn>=0.3.0
 
 ---
 
-## ✅ **Stage 5: Deep Learning & RL (Advanced, Optional)**
+##  **Stage 5: Deep Learning & RL (Advanced, Optional)**
 
 For reinforcement learning strategies:
 
@@ -93,7 +93,7 @@ pip install stable-baselines3>=2.3.0 gymnasium>=0.29.0
 
 ---
 
-## ✅ **Stage 6: Qlib Framework (Advanced, Optional)**
+##  **Stage 6: Qlib Framework (Advanced, Optional)**
 
 Microsoft Qlib has complex dependencies:
 
@@ -107,7 +107,7 @@ pip install qlib>=0.9.0
 
 ---
 
-## ✅ **Stage 7: Development Tools (Optional)**
+##  **Stage 7: Development Tools (Optional)**
 
 For development and code quality:
 
@@ -117,7 +117,7 @@ pip install black isort flake8 mypy pylint pytest pytest-cov
 
 ---
 
-## ✅ **Stage 8: Jupyter & Visualization (Optional)**
+##  **Stage 8: Jupyter & Visualization (Optional)**
 
 For interactive development:
 
@@ -127,7 +127,7 @@ pip install jupyter jupyterlab ipython ipywidgets
 
 ---
 
-## 🎯 **Recommended Installation Path**
+##  **Recommended Installation Path**
 
 ### For Quick Testing:
 ```bash
@@ -153,7 +153,7 @@ pip install black pytest jupyterlab
 
 ---
 
-## 🔧 **Troubleshooting**
+##  **Troubleshooting**
 
 ### Issue: Package installation fails
 
@@ -189,7 +189,7 @@ pip install "pandas>=2.2.0,<3.0.0" "numpy>=1.26.0,<2.0.0"
 
 ---
 
-## 📋 **Verification Checklist**
+##  **Verification Checklist**
 
 After each stage, verify installation:
 
@@ -198,7 +198,7 @@ After each stage, verify installation:
 python -c "
 from src.data_pipeline import DataPipeline, OpenBBDataFetcher
 from src.feature_engineering import TechnicalIndicators
-print('✅ Core components working!')
+print(' Core components working!')
 "
 ```
 
@@ -206,7 +206,7 @@ print('✅ Core components working!')
 ```python
 python -c "
 import lightgbm, xgboost, sklearn
-print('✅ ML libraries installed!')
+print(' ML libraries installed!')
 "
 ```
 
@@ -214,13 +214,13 @@ print('✅ ML libraries installed!')
 ```python
 python -c "
 import matplotlib, seaborn, plotly
-print('✅ Visualization libraries installed!')
+print(' Visualization libraries installed!')
 "
 ```
 
 ---
 
-## 🚀 **Quick Start After Installation**
+##  **Quick Start After Installation**
 
 Once Stage 1 is complete:
 
@@ -233,7 +233,7 @@ python -c "
 from src.data_pipeline import DataStorageManager
 storage = DataStorageManager()
 df = storage.query_ohlcv(symbols=['RELIANCE'])
-print(f'✅ {len(df)} rows in database')
+print(f' {len(df)} rows in database')
 "
 
 # 3. Generate features
@@ -246,13 +246,13 @@ df = storage.query_ohlcv(symbols=['RELIANCE'])
 
 indicators = TechnicalIndicators()
 df_features = indicators.generate_all_features(df)
-print(f'✅ Generated {len(df_features.columns)} features')
+print(f' Generated {len(df_features.columns)} features')
 "
 ```
 
 ---
 
-## 💡 **Best Practices**
+##  **Best Practices**
 
 1. **Always use virtual environment**:
    ```bash
@@ -277,7 +277,7 @@ print(f'✅ Generated {len(df_features.columns)} features')
 
 ---
 
-## 📚 **What Each File Does**
+##  **What Each File Does**
 
 - **requirements-minimal.txt**: Core data pipeline only (~12 packages)
 - **requirements.txt**: Full system with all features (~50+ packages)
@@ -285,21 +285,21 @@ print(f'✅ Generated {len(df_features.columns)} features')
 
 ---
 
-## ✨ **Success Criteria**
+##  **Success Criteria**
 
 You're ready to proceed when:
 
-✅ `pip install -r requirements-minimal.txt` succeeds  
-✅ `from src.data_pipeline import DataPipeline` works  
-✅ Can fetch real market data  
-✅ Can store data in DuckDB  
-✅ Can generate technical indicators  
+ `pip install -r requirements-minimal.txt` succeeds  
+ `from src.data_pipeline import DataPipeline` works  
+ Can fetch real market data  
+ Can store data in DuckDB  
+ Can generate technical indicators  
 
 **Everything else is optional enhancement!**
 
 ---
 
-## 🆘 **Still Having Issues?**
+##  **Still Having Issues?**
 
 1. Check Python version: `python --version` (needs 3.11+)
 2. Try fresh virtual environment

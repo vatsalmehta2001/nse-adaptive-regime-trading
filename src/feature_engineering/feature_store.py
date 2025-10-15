@@ -93,7 +93,7 @@ class FeatureStore:
             ON market_regimes(date)
         """)
         
-        logger.info("✅ Feature store schema created")
+        logger.info(" Feature store schema created")
         
     def store_factors(
         self,

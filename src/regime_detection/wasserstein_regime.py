@@ -129,7 +129,7 @@ class WassersteinRegimeDetector:
         self._characterize_regimes(data, cluster_labels, distribution_dates)
         
         self._fitted = True
-        logger.info("✅ Regime detector fitted successfully")
+        logger.info(" Regime detector fitted successfully")
         
         return self
     

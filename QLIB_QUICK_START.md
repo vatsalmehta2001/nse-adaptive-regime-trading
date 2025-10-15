@@ -1,40 +1,40 @@
-# 🚀 Qlib Alpha-158 & Regime Detection - Quick Start Guide
+#  Qlib Alpha-158 & Regime Detection - Quick Start Guide
 
-## ✅ Implementation Complete - All Tests Passed!
+##  Implementation Complete - All Tests Passed!
 
 **Production-ready institutional-grade alpha factors and regime detection**
 
 ---
 
-## 🎯 What Was Implemented
+##  What Was Implemented
 
-### Core Components (All Verified ✅)
+### Core Components (All Verified )
 
 1. **Qlib Alpha-158 Factor Library**
-   - ✅ Exactly **158 institutional-grade alpha factors**
-   - ✅ Processing speed: **<5 seconds** for 500 days
-   - ✅ Fully vectorized (NO loops)
-   - ✅ No NaN after 60-day warmup
-   - ✅ No Inf values
+   -  Exactly **158 institutional-grade alpha factors**
+   -  Processing speed: **<5 seconds** for 500 days
+   -  Fully vectorized (NO loops)
+   -  No NaN after 60-day warmup
+   -  No Inf values
 
 2. **Wasserstein Regime Detection**
-   - ✅ 4 market regimes: bull, bear, high_volatility, crash
-   - ✅ COVID crash validation (March 2020)
-   - ✅ Statistical characterization
+   -  4 market regimes: bull, bear, high_volatility, crash
+   -  COVID crash validation (March 2020)
+   -  Statistical characterization
 
 3. **DuckDB Feature Store**
-   - ✅ Efficient factor storage
-   - ✅ UPSERT logic (no duplicates)
-   - ✅ Fast indexed queries
+   -  Efficient factor storage
+   -  UPSERT logic (no duplicates)
+   -  Fast indexed queries
 
 4. **Factor Analysis Toolkit**
-   - ✅ IC (Information Coefficient) calculation
-   - ✅ Correlation analysis
-   - ✅ VIF (multicollinearity detection)
+   -  IC (Information Coefficient) calculation
+   -  Correlation analysis
+   -  VIF (multicollinearity detection)
 
 ---
 
-## 🚀 Quick Start Commands
+##  Quick Start Commands
 
 ### Test 1: Verify Installation
 ```bash
@@ -53,11 +53,11 @@ df = pd.DataFrame({
 
 generator = QlibAlpha158()
 factors = generator.generate_all_factors(df)
-print(f'✅ Generated {len([c for c in factors.columns if c.startswith(\"factor_\")])} factors')
+print(f' Generated {len([c for c in factors.columns if c.startswith(\"factor_\")])} factors')
 "
 ```
 
-**Expected output:** `✅ Generated 158 factors`
+**Expected output:** ` Generated 158 factors`
 
 ---
 
@@ -102,7 +102,7 @@ print(ic_df.nlargest(10, 'abs_mean_ic')[['factor', 'ic_5d', 'mean_ic']])
 
 ---
 
-## 📊 Factor Breakdown
+##  Factor Breakdown
 
 | Group | Count | Description | Examples |
 |-------|-------|-------------|----------|
@@ -113,29 +113,29 @@ print(ic_df.nlargest(10, 'abs_mean_ic')[['factor', 'ic_5d', 'mean_ic']])
 | **Volume** | 24 | Volume-price | Volume ratio, VSTD, money flow |
 | **Beta** | 4 | Market sensitivity | Rolling beta, residual volatility |
 | **Stats** | 20 | Advanced stats | Skew, kurtosis, momentum, breakouts |
-| **TOTAL** | **158** | ✅ **ALL VERIFIED** |
+| **TOTAL** | **158** |  **ALL VERIFIED** |
 
 ---
 
-## 🔬 Verification Results
+##  Verification Results
 
-### End-to-End Test with Real Data ✅
+### End-to-End Test with Real Data 
 ```
-✅ Loaded 494 rows for RELIANCE
-✅ Generated 158 factors in 0.03s
-✅ Speed check: PASS (target: <5s)
-✅ Factor count: EXACTLY 158
-✅ Total NaN values: 0
-✅ Infinite values: 0
-✅ Stored 494 rows in DuckDB
-✅ Retrieved 494 rows from database
+ Loaded 494 rows for RELIANCE
+ Generated 158 factors in 0.03s
+ Speed check: PASS (target: <5s)
+ Factor count: EXACTLY 158
+ Total NaN values: 0
+ Infinite values: 0
+ Stored 494 rows in DuckDB
+ Retrieved 494 rows from database
 ```
 
-**Result: ALL TESTS PASSED** 🎉
+**Result: ALL TESTS PASSED** 
 
 ---
 
-## 📚 Usage Examples
+##  Usage Examples
 
 ### Example 1: Generate Factors for Multiple Symbols
 ```bash
@@ -216,7 +216,7 @@ print(f"Total features: {len(complete_features.columns)}")
 
 ---
 
-## 🧪 Run Tests
+##  Run Tests
 
 ```bash
 # Run all tests
@@ -230,30 +230,30 @@ pytest tests/unit/test_factors_and_regimes.py::TestWassersteinRegime::test_covid
 
 ---
 
-## 📁 Files Reference
+##  Files Reference
 
 ### Implementation Files
 ```
 src/feature_engineering/
-├── qlib_factors.py          # 158 alpha factors ✅
-├── feature_store.py         # DuckDB storage ✅
-├── factor_analysis.py       # IC, correlation, VIF ✅
-├── regime_features.py       # Regime-aware features ✅
-└── __init__.py              # Updated exports ✅
+ qlib_factors.py          # 158 alpha factors 
+ feature_store.py         # DuckDB storage 
+ factor_analysis.py       # IC, correlation, VIF 
+ regime_features.py       # Regime-aware features 
+ __init__.py              # Updated exports 
 
 src/regime_detection/
-├── wasserstein_regime.py    # Wasserstein clustering ✅
-├── hmm_regime.py            # Gaussian Mixture ✅
-└── __init__.py              # Module exports ✅
+ wasserstein_regime.py    # Wasserstein clustering 
+ hmm_regime.py            # Gaussian Mixture 
+ __init__.py              # Module exports 
 
 scripts/
-└── generate_factors.py      # Pipeline script ✅
+ generate_factors.py      # Pipeline script 
 
 config/
-└── factor_config.yaml       # Configuration ✅
+ factor_config.yaml       # Configuration 
 
 tests/unit/
-└── test_factors_and_regimes.py  # Tests ✅
+ test_factors_and_regimes.py  # Tests 
 ```
 
 ### Documentation
@@ -264,7 +264,7 @@ QLIB_QUICK_START.md              # This file (quick reference)
 
 ---
 
-## 🎯 Next Steps
+##  Next Steps
 
 ### 1. Generate Factors for Your Full Dataset
 ```bash
@@ -312,7 +312,7 @@ print(f"R² Score: {score:.4f}")
 
 ---
 
-## 💡 Pro Tips
+##  Pro Tips
 
 1. **Start Small**: Test with 1-3 symbols first
    ```bash
@@ -349,7 +349,7 @@ print(f"R² Score: {score:.4f}")
 
 ---
 
-## 🔧 Troubleshooting
+##  Troubleshooting
 
 ### Issue: "No data for symbol"
 **Solution:** Ensure you've run `setup_data_pipeline.py` first to fetch OHLCV data
@@ -361,11 +361,11 @@ print(f"R² Score: {score:.4f}")
 **Solution:** Process symbols in batches instead of all at once
 
 ### Issue: "Slow factor generation"
-**Solution:** Ensure you're using vectorized operations (all implemented ✅)
+**Solution:** Ensure you're using vectorized operations (all implemented )
 
 ---
 
-## 📊 Performance Benchmarks
+##  Performance Benchmarks
 
 | Operation | Time | Data Size |
 |-----------|------|-----------|
@@ -376,28 +376,28 @@ print(f"R² Score: {score:.4f}")
 | Calculate IC | ~1s | 158 factors |
 | Regime detection | ~5s | 500 days |
 
-**All performance targets met!** ⚡
+**All performance targets met!** 
 
 ---
 
-## 🎉 Success Criteria - ALL MET ✅
+##  Success Criteria - ALL MET 
 
 | Criterion | Target | Result | Status |
 |-----------|--------|--------|--------|
-| Exact factor count | 158 | 158 | ✅ |
-| No NaN after warmup | 0 | 0 | ✅ |
-| No Inf values | 0 | 0 | ✅ |
-| Processing speed | <5s | ~2-3s | ✅ |
-| Regime count | 4 | 4 | ✅ |
-| COVID detection | ✓ | ✓ | ✅ |
-| Vectorized | 100% | 100% | ✅ |
-| Type hints | All | All | ✅ |
-| Docstrings | All | All | ✅ |
-| Tests pass | >85% | ~85% | ✅ |
+| Exact factor count | 158 | 158 |  |
+| No NaN after warmup | 0 | 0 |  |
+| No Inf values | 0 | 0 |  |
+| Processing speed | <5s | ~2-3s |  |
+| Regime count | 4 | 4 |  |
+| COVID detection |  |  |  |
+| Vectorized | 100% | 100% |  |
+| Type hints | All | All |  |
+| Docstrings | All | All |  |
+| Tests pass | >85% | ~85% |  |
 
 ---
 
-## 🎯 Your System is Ready!
+##  Your System is Ready!
 
 ```bash
 # Generate factors for your data
@@ -415,11 +415,11 @@ print(f'Retrieved {len(factors)} rows with {len(factors.columns)} columns')
 "
 ```
 
-**All components are production-ready for institutional-grade quantitative research!** 🚀📊
+**All components are production-ready for institutional-grade quantitative research!** 
 
 ---
 
-## 📚 Learn More
+##  Learn More
 
 - **QLIB_REGIME_IMPLEMENTATION.md** - Detailed implementation guide
 - **config/factor_config.yaml** - Configuration options
@@ -427,5 +427,5 @@ print(f'Retrieved {len(factors)} rows with {len(factors.columns)} columns')
 
 ---
 
-**Ready for ML model training and strategy development!** 🎉
+**Ready for ML model training and strategy development!** 
 

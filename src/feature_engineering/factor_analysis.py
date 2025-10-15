@@ -96,7 +96,7 @@ class FactorAnalyzer:
         ic_df = pd.DataFrame(ic_results)
         ic_df = ic_df.sort_values('abs_mean_ic', ascending=False)
         
-        logger.info(f"✅ IC calculated. Mean IC: {ic_df['mean_ic'].mean():.4f}")
+        logger.info(f" IC calculated. Mean IC: {ic_df['mean_ic'].mean():.4f}")
         
         return ic_df
     
@@ -262,7 +262,7 @@ class FactorAnalyzer:
         
         vif_series = pd.Series(vif_data).sort_values(ascending=False)
         
-        logger.info(f"✅ VIF calculated. Median VIF: {vif_series.median():.2f}")
+        logger.info(f" VIF calculated. Median VIF: {vif_series.median():.2f}")
         
         return vif_series
     
@@ -323,7 +323,7 @@ class FactorAnalyzer:
             if not is_correlated:
                 selected.append(factor)
         
-        logger.info(f"✅ Selected {len(selected)} factors (removed correlated)")
+        logger.info(f" Selected {len(selected)} factors (removed correlated)")
         
         return selected
     
@@ -387,5 +387,5 @@ class FactorAnalyzer:
         with open(output_path, 'w') as f:
             f.write(html)
         
-        logger.info(f"✅ Report saved to {output_path}")
+        logger.info(f" Report saved to {output_path}")
 

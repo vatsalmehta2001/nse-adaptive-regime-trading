@@ -120,7 +120,7 @@ pip install -r requirements.txt
 python -c "
 from src.data_pipeline import DataPipeline
 from src.feature_engineering import TechnicalIndicators
-print('✅ All imports successful!')
+print(' All imports successful!')
 "
 ```
 
@@ -174,7 +174,7 @@ from src.data_pipeline import OpenBBDataFetcher
 fetcher = OpenBBDataFetcher()
 print('Fetching RELIANCE data...')
 df = fetcher.fetch_equity_ohlcv(['RELIANCE'], '2024-01-01', '2024-01-31')
-print(f'✅ Fetched {len(df)} rows')
+print(f' Fetched {len(df)} rows')
 "
 ```
 
@@ -216,9 +216,9 @@ for package in packages:
     try:
         mod = __import__(package)
         version = getattr(mod, '__version__', 'unknown')
-        print(f'✅ {package}: {version}')
+        print(f' {package}: {version}')
     except ImportError as e:
-        print(f'❌ {package}: NOT INSTALLED')
+        print(f' {package}: NOT INSTALLED')
 "
 ```
 

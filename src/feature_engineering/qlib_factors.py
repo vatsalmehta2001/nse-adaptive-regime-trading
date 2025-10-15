@@ -119,7 +119,7 @@ class QlibAlpha158:
         assert len(factor_cols) == 158, f"Expected 158 factors, got {len(factor_cols)}"
         
         if symbol:
-            logger.info(f"✅ Generated {len(factor_cols)} factors for {symbol}")
+            logger.info(f" Generated {len(factor_cols)} factors for {symbol}")
         
         return factors
     

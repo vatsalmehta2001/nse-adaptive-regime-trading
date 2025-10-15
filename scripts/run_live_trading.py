@@ -59,7 +59,7 @@ def run_live_trading(mode: str = "paper", confirm: bool = False) -> None:
             logger.error("This will trade with REAL MONEY. Use paper trading to test first.")
             sys.exit(1)
 
-        logger.warning("⚠️  LIVE TRADING MODE - REAL MONEY AT RISK ⚠️")
+        logger.warning("  LIVE TRADING MODE - REAL MONEY AT RISK ")
         logger.warning("Press Ctrl+C to stop trading gracefully")
 
         # Final confirmation
@@ -117,7 +117,7 @@ def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser(
         description="Run live trading system",
-        epilog="⚠️  WARNING: Live trading involves real financial risk. "
+        epilog="  WARNING: Live trading involves real financial risk. "
         "Test thoroughly with paper trading first.",
     )
 

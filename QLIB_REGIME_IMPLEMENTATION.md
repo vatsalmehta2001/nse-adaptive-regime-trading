@@ -1,69 +1,69 @@
-# 🎯 Qlib Alpha-158 & Regime Detection - Implementation Complete
+#  Qlib Alpha-158 & Regime Detection - Implementation Complete
 
-## ✅ ALL DELIVERABLES IMPLEMENTED
+##  ALL DELIVERABLES IMPLEMENTED
 
-### 📊 Core Components
+###  Core Components
 
-1. **✅ QlibAlpha158 - 158 Institutional-Grade Alpha Factors**
+1. ** QlibAlpha158 - 158 Institutional-Grade Alpha Factors**
    - File: `src/feature_engineering/qlib_factors.py` 
    - **VERIFIED: Exactly 158 factors**
    - Fully vectorized (no loops)
-   - Processing speed: <5s for 500 days ✓
-   - No NaN after 60-day warmup ✓
-   - No Inf values ✓
+   - Processing speed: <5s for 500 days 
+   - No NaN after 60-day warmup 
+   - No Inf values 
    
-2. **✅ WassersteinRegimeDetector - Market Regime Detection**
+2. ** WassersteinRegimeDetector - Market Regime Detection**
    - File: `src/regime_detection/wasserstein_regime.py`
    - 4 regimes: bull, bear, high_volatility, crash
    - COVID crash validation included
    - Wasserstein distance-based clustering
    
-3. **✅ HMMRegimeDetector - Gaussian Mixture Alternative**
+3. ** HMMRegimeDetector - Gaussian Mixture Alternative**
    - File: `src/regime_detection/hmm_regime.py`
    - Uses sklearn.GaussianMixture (hmmlearn alternative)
    - Transition matrix calculation
    - Emission parameters extraction
    
-4. **✅ FeatureStore - DuckDB Storage**
+4. ** FeatureStore - DuckDB Storage**
    - File: `src/feature_engineering/feature_store.py`
    - Tables: `alpha158_factors`, `market_regimes`
    - Efficient indexing and querying
    - UPSERT logic for deduplication
    
-5. **✅ FactorAnalyzer - IC, Correlation, VIF**
+5. ** FactorAnalyzer - IC, Correlation, VIF**
    - File: `src/feature_engineering/factor_analysis.py`
    - Information Coefficient calculation
    - Correlation analysis
    - Variance Inflation Factor
    - Regime-specific IC
    
-6. **✅ RegimeFeatureEngineer - Regime-Aware Features**
+6. ** RegimeFeatureEngineer - Regime-Aware Features**
    - File: `src/feature_engineering/regime_features.py`
    - 158 factors + 4 regime dummies + stability features
    - Interaction features (optional)
    - Total: ~244 features
    
-7. **✅ Pipeline Script - generate_factors.py**
+7. ** Pipeline Script - generate_factors.py**
    - File: `scripts/generate_factors.py`
    - End-to-end factor generation
    - Regime detection
    - Factor analysis
    - Progress tracking with tqdm
    
-8. **✅ Comprehensive Tests**
+8. ** Comprehensive Tests**
    - File: `tests/unit/test_factors_and_regimes.py`
    - COVID crash validation
    - Exact factor count verification
    - Speed tests
    - Storage tests
    
-9. **✅ Configuration**
+9. ** Configuration**
    - File: `config/factor_config.yaml`
    - Complete configuration for all components
    
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Install Dependencies (if not already installed)
 ```bash
@@ -75,7 +75,7 @@ pip install scipy scikit-learn statsmodels matplotlib seaborn --prefer-binary
 python -c "
 from src.feature_engineering import QlibAlpha158, FeatureStore, FactorAnalyzer
 from src.regime_detection import WassersteinRegimeDetector, HMMRegimeDetector
-print('✅ All components imported successfully')
+print(' All components imported successfully')
 "
 ```
 
@@ -119,7 +119,7 @@ print(f"Generated {len([c for c in factors.columns if c.startswith('factor_')])}
 
 ---
 
-## 📋 Factor Breakdown (158 Total)
+##  Factor Breakdown (158 Total)
 
 | Group | Factors | Description |
 |-------|---------|-------------|
@@ -130,13 +130,13 @@ print(f"Generated {len([c for c in factors.columns if c.startswith('factor_')])}
 | **Volume** | 24 | Volume-price relationships |
 | **Beta** | 4 | Market sensitivity & residual risk |
 | **Stats** | 20 | Skew, kurtosis, momentum, breakouts |
-| **TOTAL** | **158** | ✅ **VERIFIED** |
+| **TOTAL** | **158** |  **VERIFIED** |
 
 ---
 
-## 🔬 Success Criteria - ALL PASSED ✅
+##  Success Criteria - ALL PASSED 
 
-### 1. ✅ Exact Factor Count
+### 1.  Exact Factor Count
 ```python
 from src.feature_engineering import QlibAlpha158
 import pandas as pd
@@ -156,23 +156,23 @@ generator = QlibAlpha158()
 factors = generator.generate_all_factors(df)
 factor_cols = [c for c in factors.columns if c.startswith('factor_')]
 
-assert len(factor_cols) == 158  # ✅ PASSES
-print(f"✅ {len(factor_cols)} factors generated")
+assert len(factor_cols) == 158  #  PASSES
+print(f" {len(factor_cols)} factors generated")
 ```
 
-### 2. ✅ No NaN After Warmup
+### 2.  No NaN After Warmup
 ```python
 # After 60-day warmup, no NaN values
-assert not factors.iloc[60:][factor_cols].isnull().any().any()  # ✅ PASSES
+assert not factors.iloc[60:][factor_cols].isnull().any().any()  #  PASSES
 ```
 
-### 3. ✅ No Inf Values
+### 3.  No Inf Values
 ```python
 import numpy as np
-assert not np.isinf(factors[factor_cols]).any().any()  # ✅ PASSES
+assert not np.isinf(factors[factor_cols]).any().any()  #  PASSES
 ```
 
-### 4. ✅ Vectorization Speed (<5s for 500 days)
+### 4.  Vectorization Speed (<5s for 500 days)
 ```python
 import time
 dates = pd.date_range('2023-01-01', '2024-12-31', freq='D')  # 730 days
@@ -182,10 +182,10 @@ start = time.time()
 factors = generator.generate_all_factors(df)
 duration = time.time() - start
 
-assert duration < 5.0  # ✅ PASSES (typically ~2-3 seconds)
+assert duration < 5.0  #  PASSES (typically ~2-3 seconds)
 ```
 
-### 5. ✅ COVID Crash Detection
+### 5.  COVID Crash Detection
 ```python
 from src.regime_detection import WassersteinRegimeDetector
 
@@ -195,12 +195,12 @@ detector.fit(nifty_data)
 validation = detector.validate_regimes(nifty_data)
 
 # COVID crash period will be detected as 'crash' or 'high_volatility'
-assert validation['covid_crash']['regime_name'] in ['crash', 'high_volatility']  # ✅ PASSES
+assert validation['covid_crash']['regime_name'] in ['crash', 'high_volatility']  #  PASSES
 ```
 
 ---
 
-## 📊 Usage Examples
+##  Usage Examples
 
 ### Example 1: Generate and Store Factors
 ```python
@@ -220,7 +220,7 @@ feature_store = FeatureStore()
 feature_store.create_schema()
 feature_store.store_factors(factors, symbol='RELIANCE')
 
-print(f"✅ Stored {len(factors)} rows with 158 factors")
+print(f" Stored {len(factors)} rows with 158 factors")
 ```
 
 ### Example 2: Detect Market Regimes
@@ -284,7 +284,7 @@ print(f"Total features: {len(complete_features.columns)}")
 
 ---
 
-## 🧪 Run Tests
+##  Run Tests
 
 ```bash
 # Run all factor and regime tests
@@ -297,39 +297,39 @@ pytest tests/unit/test_factors_and_regimes.py::TestWassersteinRegime::test_covid
 
 ---
 
-## 📁 Files Created
+##  Files Created
 
 ### Core Implementation
 ```
 src/feature_engineering/
-├── qlib_factors.py              # QlibAlpha158 - 158 factors ✅
-├── feature_store.py             # DuckDB storage ✅
-├── factor_analysis.py           # IC, correlation, VIF ✅
-└── regime_features.py           # Regime-aware features ✅
+ qlib_factors.py              # QlibAlpha158 - 158 factors 
+ feature_store.py             # DuckDB storage 
+ factor_analysis.py           # IC, correlation, VIF 
+ regime_features.py           # Regime-aware features 
 
 src/regime_detection/
-├── wasserstein_regime.py        # Wasserstein clustering ✅
-├── hmm_regime.py                # Gaussian Mixture alternative ✅
-└── __init__.py                  # Module exports ✅
+ wasserstein_regime.py        # Wasserstein clustering 
+ hmm_regime.py                # Gaussian Mixture alternative 
+ __init__.py                  # Module exports 
 
 scripts/
-└── generate_factors.py          # End-to-end pipeline ✅
+ generate_factors.py          # End-to-end pipeline 
 
 config/
-└── factor_config.yaml           # Configuration ✅
+ factor_config.yaml           # Configuration 
 
 tests/unit/
-└── test_factors_and_regimes.py  # Comprehensive tests ✅
+ test_factors_and_regimes.py  # Comprehensive tests 
 ```
 
 ### Documentation
 ```
-QLIB_REGIME_IMPLEMENTATION.md    # This file ✅
+QLIB_REGIME_IMPLEMENTATION.md    # This file 
 ```
 
 ---
 
-## 🎯 Next Steps
+##  Next Steps
 
 ### 1. Generate Factors for Your Data
 ```bash
@@ -374,7 +374,7 @@ print(importance.nlargest(20))
 
 ---
 
-## 🔧 Configuration
+##  Configuration
 
 Edit `config/factor_config.yaml` to customize:
 
@@ -398,33 +398,33 @@ regime_detection:
 
 ---
 
-## 📈 Performance Metrics
+##  Performance Metrics
 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
-| Factor Count | 158 | 158 | ✅ |
-| Processing Speed (500 days) | <5s | ~2-3s | ✅ |
-| NaN after warmup | 0 | 0 | ✅ |
-| Inf values | 0 | 0 | ✅ |
-| Regime Detection | 4 distinct | 4 distinct | ✅ |
-| COVID Crash Detection | crash/highvol | ✅ | ✅ |
-| Test Coverage | >80% | ~85% | ✅ |
+| Factor Count | 158 | 158 |  |
+| Processing Speed (500 days) | <5s | ~2-3s |  |
+| NaN after warmup | 0 | 0 |  |
+| Inf values | 0 | 0 |  |
+| Regime Detection | 4 distinct | 4 distinct |  |
+| COVID Crash Detection | crash/highvol |  |  |
+| Test Coverage | >80% | ~85% |  |
 
 ---
 
-## 🎉 Summary
+##  Summary
 
 **ALL DELIVERABLES COMPLETE!**
 
-✅ Qlib Alpha-158: **158 institutional-grade factors** (verified)  
-✅ Wasserstein Regime Detection: **4 regimes with COVID validation**  
-✅ HMM Alternative: **Gaussian Mixture implementation**  
-✅ Feature Store: **DuckDB storage with efficient indexing**  
-✅ Factor Analyzer: **IC, correlation, VIF calculations**  
-✅ Regime Features: **~244 combined features**  
-✅ Pipeline: **End-to-end factor generation script**  
-✅ Tests: **Comprehensive test suite with COVID validation**  
-✅ Config: **Complete YAML configuration**  
+ Qlib Alpha-158: **158 institutional-grade factors** (verified)  
+ Wasserstein Regime Detection: **4 regimes with COVID validation**  
+ HMM Alternative: **Gaussian Mixture implementation**  
+ Feature Store: **DuckDB storage with efficient indexing**  
+ Factor Analyzer: **IC, correlation, VIF calculations**  
+ Regime Features: **~244 combined features**  
+ Pipeline: **End-to-end factor generation script**  
+ Tests: **Comprehensive test suite with COVID validation**  
+ Config: **Complete YAML configuration**  
 
-**Your regime-adaptive trading system is ready for ML model training!** 🚀📊
+**Your regime-adaptive trading system is ready for ML model training!** 
 

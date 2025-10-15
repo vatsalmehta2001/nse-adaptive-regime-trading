@@ -1,10 +1,10 @@
-# 📋 Qlib Alpha-158 & Regime Detection - Command Reference
+#  Qlib Alpha-158 & Regime Detection - Command Reference
 
-## ⚡ Quick Commands
+##  Quick Commands
 
 ### Verify Installation
 ```bash
-python -c "from src.feature_engineering import QlibAlpha158; print('✅ Ready!')"
+python -c "from src.feature_engineering import QlibAlpha158; print(' Ready!')"
 ```
 
 ### Generate Factors for Your Data
@@ -126,7 +126,7 @@ pytest tests/unit/test_factors_and_regimes.py::TestWassersteinRegime::test_covid
 
 ---
 
-## 📊 Database Queries
+##  Database Queries
 
 ### Check Factor Coverage
 ```python
@@ -159,7 +159,7 @@ print(f"  Rows: {stats.get('regimes', {}).get('total_rows', 0):,}")
 
 ---
 
-## 🧪 Test Individual Components
+##  Test Individual Components
 
 ### Test Factor Generation
 ```python
@@ -203,7 +203,7 @@ print(f"HMM regimes: {len(hmm_regimes)}")
 
 ---
 
-## 🎯 Complete Workflow Example
+##  Complete Workflow Example
 
 ```python
 # 1. Load OHLCV data
@@ -252,7 +252,7 @@ print(f"Model R² score: {score:.4f}")
 
 ---
 
-## 📖 Documentation
+##  Documentation
 
 - **QLIB_QUICK_START.md** - This file (quick reference)
 - **QLIB_REGIME_IMPLEMENTATION.md** - Detailed guide
@@ -260,17 +260,17 @@ print(f"Model R² score: {score:.4f}")
 
 ---
 
-## ✅ Success Criteria
+##  Success Criteria
 
 | Criterion | Status |
 |-----------|--------|
-| Exactly 158 factors | ✅ VERIFIED |
-| Processing speed <5s | ✅ PASS (~0.03s) |
-| No NaN after warmup | ✅ PASS |
-| No Inf values | ✅ PASS |
-| 4 regimes detected | ✅ PASS |
-| COVID validation | ✅ PASS |
-| End-to-end workflow | ✅ PASS |
+| Exactly 158 factors |  VERIFIED |
+| Processing speed <5s |  PASS (~0.03s) |
+| No NaN after warmup |  PASS |
+| No Inf values |  PASS |
+| 4 regimes detected |  PASS |
+| COVID validation |  PASS |
+| End-to-end workflow |  PASS |
 
-**All criteria met! Production-ready!** 🚀
+**All criteria met! Production-ready!** 
 
