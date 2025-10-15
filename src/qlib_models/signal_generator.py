@@ -173,7 +173,7 @@ class AlphaSignalGenerator:
             n_short: Fixed number of short positions (overrides short_pct)
             
         Returns:
-            DataFrame with [symbol, signal, weight]
+            DataFrame with [symbol, date, signal, weight]
             signal: 1 (long), -1 (short), 0 (neutral)
         """
         logger.info("Generating long/short signals...")
@@ -182,14 +182,18 @@ class AlphaSignalGenerator:
         
         # Handle multi-index (symbol, date) vs single index
         if isinstance(predictions.index, pd.MultiIndex):
-            # Group by date and generate signals
-            for date, date_preds in predictions.groupby(level='date'):
+            # Group by date and generate signals for each date
+            dates = predictions.index.get_level_values('date').unique()
+            
+            for date in dates:
+                # Get predictions for this date only
+                date_preds = predictions.xs(date, level='date')
                 signals_df = self._generate_signals_for_date(
                     date_preds, date, long_pct, short_pct, n_long, n_short
                 )
                 results.append(signals_df)
             
-            signals = pd.concat(results).reset_index(drop=True)
+            signals = pd.concat(results, ignore_index=True)
         
         else:
             # Single date

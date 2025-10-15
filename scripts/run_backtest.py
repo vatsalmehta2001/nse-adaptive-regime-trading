@@ -218,10 +218,6 @@ def run_simple_backtest(
         short_pct=args.short_pct
     )
     
-    # Add date from index
-    if isinstance(factors.index, pd.MultiIndex):
-        signals['date'] = factors.index.get_level_values('date')[0]
-    
     logger.info(f"Generated {len(signals)} signals")
     
     # Run backtest
@@ -337,21 +333,44 @@ def main():
     
     logger.info(f"Loaded {len(factors)} factor rows")
     
-    # Check for price column (factor_001 is close price in Alpha-158)
-    if 'close' not in factors.columns and 'factor_001' not in factors.columns:
-        logger.error("No 'close' or 'factor_001' price column found for backtesting.")
+    # Load actual prices from OHLCV table (factor_001 contains returns, not prices!)
+    logger.info("Loading actual prices from OHLCV table...")
+    
+    import duckdb
+    conn = duckdb.connect(args.db_path)
+    
+    # Get unique dates and symbols
+    if isinstance(factors.index, pd.MultiIndex):
+        symbols_list = factors.index.get_level_values('symbol').unique().tolist()
+        dates_list = factors.index.get_level_values('date').unique().tolist()
+    else:
+        # This shouldn't happen for backtesting
+        logger.error("Expected multi-index factors for backtesting")
         return
     
-    # Add close column if not present (use factor_001 which is close price in Alpha-158)
-    if 'close' not in factors.columns:
-        factors['close'] = factors['factor_001']
-        logger.info("Using factor_001 as close price column")
+    # Query OHLCV for actual prices
+    symbols_str = ','.join([f"'{s}'" for s in symbols_list])
+    prices_query = f"""
+        SELECT date, symbol, close 
+        FROM ohlcv 
+        WHERE symbol IN ({symbols_str})
+          AND date >= '{args.start}'
+          AND date <= '{args.end}'
+        ORDER BY date, symbol
+    """
     
-    # Extract prices for backtest
-    if isinstance(factors.index, pd.MultiIndex):
-        prices = factors[['close']].copy()
-    else:
-        prices = factors[['close']].copy()
+    prices_df = conn.execute(prices_query).fetchdf()
+    conn.close()
+    
+    if prices_df.empty:
+        logger.error("No price data found in OHLCV table for backtest period")
+        return
+    
+    logger.info(f"Loaded {len(prices_df)} price rows from OHLCV table")
+    
+    # Format prices for backtest engine
+    prices_df['date'] = pd.to_datetime(prices_df['date'])
+    prices = prices_df
     
     # Load models
     logger.info("\nLoading models...")
