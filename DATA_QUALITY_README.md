@@ -76,9 +76,9 @@ print(f"Grade: {report['quality_grade']}")
 - Based on analysis of historical NSE data
 
 **Previous Issue:**
-- ❌ Old code used 1000% threshold (10x return!)
-- ❌ Allowed unrealistic data through
-- ✅ New code uses 20% (production-grade)
+-  Old code used 1000% threshold (10x return!)
+-  Allowed unrealistic data through
+-  New code uses 20% (production-grade)
 
 ### Configuration File
 
@@ -90,11 +90,11 @@ thresholds:
     daily: 0.20      # 20% NSE circuit breaker
     weekly: 0.50     # 50% weekly
     monthly: 1.00    # 100% monthly
-  
+
   prices:
     min_price: 1.0              # Minimum INR price
     max_intraday_jump: 0.30     # 30% intraday move
-  
+
   completeness:
     min_data_points: 60              # 60 days minimum
     max_missing_ratio: 0.10          # Max 10% missing
@@ -134,10 +134,10 @@ Where issue penalties:
 
 | Score | Grade | Meaning | Action |
 |-------|-------|---------|--------|
-| 90-100 | **EXCELLENT** | Production ready | ✅ Use for training & backtesting |
-| 75-89 | **GOOD** | Minor issues, usable | ✅ Safe to use, monitor issues |
-| 60-74 | **ACCEPTABLE** | Review carefully | ⚠️ Review issues before use |
-| 0-59 | **POOR** | Fix data issues | ❌ Do not use, fix issues first |
+| 90-100 | **EXCELLENT** | Production ready |  Use for training & backtesting |
+| 75-89 | **GOOD** | Minor issues, usable |  Safe to use, monitor issues |
+| 60-74 | **ACCEPTABLE** | Review carefully |  Review issues before use |
+| 0-59 | **POOR** | Fix data issues |  Do not use, fix issues first |
 
 ---
 
@@ -152,7 +152,7 @@ audit = {
     'final_rows': 950,
     'total_filtered': 50,
     'retention_rate': 0.95,
-    
+
     'filtered_by_symbol': {
         'RELIANCE': {
             'count': 50,
@@ -162,7 +162,7 @@ audit = {
             'min_return': -0.25
         }
     },
-    
+
     'extreme_dates': [
         {
             'symbol': 'RELIANCE',
@@ -177,11 +177,11 @@ audit = {
 
 ### What Gets Logged
 
-✅ Every filtered data point  
-✅ Reason for filtering  
-✅ Symbol and date affected  
-✅ Actual value that exceeded threshold  
-✅ Statistics (max, min, count)  
+ Every filtered data point
+ Reason for filtering
+ Symbol and date affected
+ Actual value that exceeded threshold
+ Statistics (max, min, count)
 
 ---
 
@@ -314,14 +314,14 @@ quality_report = reporter.generate_quality_report(
 
 # Check quality score
 if quality_report['quality_score'] < 60:
-    logger.error("❌ Poor data quality! Fix issues before training.")
+    logger.error(" Poor data quality! Fix issues before training.")
     reporter.print_quality_summary(quality_report)
     sys.exit(1)
 elif quality_report['quality_score'] < 75:
-    logger.warning("⚠️  Acceptable quality. Review issues before training.")
+    logger.warning("  Acceptable quality. Review issues before training.")
     reporter.print_quality_summary(quality_report)
 else:
-    logger.info(f"✅ Good quality ({quality_report['quality_score']:.1f}/100)")
+    logger.info(f" Good quality ({quality_report['quality_score']:.1f}/100)")
 
 # Proceed with training...
 ```
@@ -418,9 +418,9 @@ EXTREME VALUES FILTERED:
     Max: +85.2%, Min: -78.5%
 
 DATA ISSUES (3):
-  🚨 [HIGH] volume_drop: Recent volume is 8.5% of historical
-  ⚠️  [MEDIUM] constant_price: 45 days with no price change
-  ℹ️  [LOW] zero_volume: 12 days with zero volume
+   [HIGH] volume_drop: Recent volume is 8.5% of historical
+    [MEDIUM] constant_price: 45 days with no price change
+    [LOW] zero_volume: 12 days with zero volume
 
 ================================================================================
 ```
@@ -546,10 +546,10 @@ for issue in report['data_issues']:
 ### 1. Always Use Audit Trails
 
 ```python
-# ❌ Don't do this
+#  Don't do this
 df_clean = df[df['returns'].abs() < 0.20]
 
-# ✅ Do this
+#  Do this
 clean_df, audit = validator.clean_returns_with_audit(df, threshold=0.20)
 reporter.generate_quality_report(clean_df, audit)
 ```
@@ -600,7 +600,7 @@ class DataQualityConfig:
     MAX_MONTHLY_RETURN = 1.00    # 100% threshold
     MIN_PRICE = 1.0              # Minimum price
     MIN_DATA_POINTS = 60         # Minimum days
-    
+
     @classmethod
     def get_threshold(cls, period: str) -> float:
         """Get threshold for time period."""
@@ -617,7 +617,7 @@ def clean_returns_with_audit(
 ) -> Tuple[pd.DataFrame, Dict]:
     """
     Filter extreme returns with audit trail.
-    
+
     Returns:
         (cleaned_df, audit_report)
     """
@@ -634,7 +634,7 @@ def generate_quality_report(
 ) -> Dict:
     """
     Generate comprehensive quality report.
-    
+
     Returns quality score (0-100) and detailed metrics.
     """
 
@@ -673,9 +673,9 @@ report = reporter.generate_quality_report(clean_df, audit, symbol='RELIANCE')
 
 # Check score
 if report['quality_score'] >= 75:
-    print("✅ Quality is GOOD or better")
+    print(" Quality is GOOD or better")
 else:
-    print("⚠️  Quality needs attention")
+    print("  Quality needs attention")
     reporter.print_quality_summary(report)
 ```
 
@@ -698,7 +698,7 @@ comparison = reporter.generate_comparison_report(reports)
 # Flag poor quality symbols
 poor_quality = comparison[comparison['quality_score'] < 75]
 if len(poor_quality) > 0:
-    print(f"⚠️  {len(poor_quality)} symbols have quality < 75:")
+    print(f"  {len(poor_quality)} symbols have quality < 75:")
     print(poor_quality[['symbol', 'quality_score', 'quality_grade']])
 ```
 
@@ -709,20 +709,20 @@ def training_quality_gate(factors: pd.DataFrame) -> bool:
     """Quality gate for model training."""
     validator = MarketDataValidator()
     reporter = DataQualityReporter()
-    
+
     clean_factors, audit = validator.clean_returns_with_audit(factors)
     report = reporter.generate_quality_report(clean_factors, audit)
-    
+
     # Production requirements
     if report['quality_score'] < 75:
-        logger.error(f"❌ Quality too low: {report['quality_score']:.1f}/100")
+        logger.error(f" Quality too low: {report['quality_score']:.1f}/100")
         return False
-    
+
     if audit['retention_rate'] < 0.90:
-        logger.error(f"❌ Too much data filtered: {audit['retention_rate']*100:.1f}%")
+        logger.error(f" Too much data filtered: {audit['retention_rate']*100:.1f}%")
         return False
-    
-    logger.info(f"✅ Quality gate passed: {report['quality_score']:.1f}/100")
+
+    logger.info(f" Quality gate passed: {report['quality_score']:.1f}/100")
     return True
 
 # Use in pipeline
@@ -743,10 +743,10 @@ For regulatory compliance, all filtering decisions must be:
 - **Reviewable**: Human-readable reports
 
 This framework provides:
-✅ Complete audit trails  
-✅ JSON and CSV exports for archiving  
-✅ Timestamp tracking  
-✅ Configurable thresholds with documentation  
+ Complete audit trails
+ JSON and CSV exports for archiving
+ Timestamp tracking
+ Configurable thresholds with documentation
 
 ---
 
@@ -772,12 +772,12 @@ test_end_to_end_quality_pipeline PASSED
 
 ## Summary
 
-✅ **Production-Grade Thresholds**: 20% daily (not 1000%)  
-✅ **Complete Audit Trails**: Every filtering decision logged  
-✅ **Quality Scoring**: 0-100 scale with actionable grades  
-✅ **Comprehensive Reports**: JSON, CSV, human-readable  
-✅ **Backward Compatible**: No breaking changes  
-✅ **Well Tested**: Comprehensive test suite  
+ **Production-Grade Thresholds**: 20% daily (not 1000%)
+ **Complete Audit Trails**: Every filtering decision logged
+ **Quality Scoring**: 0-100 scale with actionable grades
+ **Comprehensive Reports**: JSON, CSV, human-readable
+ **Backward Compatible**: No breaking changes
+ **Well Tested**: Comprehensive test suite
 
 **The data quality framework is production-ready and regulatory-compliant.**
 

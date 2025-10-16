@@ -370,3 +370,7 @@ notebooks/*_private.ipynb
 # =============================================================================
 # Use .gitkeep files to preserve directory structure
 !**/.gitkeep
+
+# Deprecated/archived documentation (kept for reference)
+deprecated/*.sh
+!deprecated/README.md

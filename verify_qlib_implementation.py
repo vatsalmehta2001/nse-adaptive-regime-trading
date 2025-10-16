@@ -13,7 +13,7 @@ def verify_files():
     print("\n" + "="*80)
     print("QLIB IMPLEMENTATION VERIFICATION")
     print("="*80 + "\n")
-    
+
     required_files = {
         'Core Components': [
             'src/qlib_models/__init__.py',
@@ -42,35 +42,35 @@ def verify_files():
             'QLIB_IMPLEMENTATION_SUMMARY.md',
         ]
     }
-    
+
     all_present = True
     total_files = 0
-    
+
     for category, files in required_files.items():
         print(f"\n{category}:")
         print("-" * 40)
-        
+
         for file_path in files:
             path = Path(file_path)
             exists = path.exists()
             status = "✓" if exists else "✗"
-            
+
             size = ""
             if exists and path.is_file():
                 size_kb = path.stat().st_size / 1024
                 size = f"({size_kb:.1f} KB)"
-            
+
             print(f"  {status} {file_path} {size}")
-            
+
             if not exists:
                 all_present = False
             else:
                 total_files += 1
-    
+
     print("\n" + "="*80)
     print(f"\nTotal Files: {total_files}")
     print(f"Status: {'ALL FILES PRESENT ✓' if all_present else 'MISSING FILES ✗'}")
-    
+
     return all_present
 
 
@@ -79,7 +79,7 @@ def verify_imports():
     print("\n" + "="*80)
     print("IMPORT VERIFICATION")
     print("="*80 + "\n")
-    
+
     imports = [
         ('QlibModelTrainer', 'from src.qlib_models import QlibModelTrainer'),
         ('AlphaSignalGenerator', 'from src.qlib_models import AlphaSignalGenerator'),
@@ -88,9 +88,9 @@ def verify_imports():
         ('PerformanceAnalyzer', 'from src.backtesting import PerformanceAnalyzer'),
         ('RegimeAdaptiveStrategy', 'from src.strategies import RegimeAdaptiveStrategy'),
     ]
-    
+
     all_success = True
-    
+
     for name, import_stmt in imports:
         try:
             exec(import_stmt)
@@ -98,9 +98,9 @@ def verify_imports():
         except ImportError as e:
             print(f"  ✗ {name}: {e}")
             all_success = False
-    
+
     print(f"\nImport Status: {'ALL IMPORTS SUCCESSFUL ✓' if all_success else 'IMPORT ERRORS ✗'}")
-    
+
     return all_success
 
 
@@ -109,7 +109,7 @@ def verify_dependencies():
     print("\n" + "="*80)
     print("DEPENDENCY VERIFICATION")
     print("="*80 + "\n")
-    
+
     dependencies = [
         'pandas',
         'numpy',
@@ -121,9 +121,9 @@ def verify_dependencies():
         'loguru',
         'tqdm',
     ]
-    
+
     all_installed = True
-    
+
     for dep in dependencies:
         try:
             __import__(dep)
@@ -131,13 +131,13 @@ def verify_dependencies():
         except ImportError:
             print(f"  ✗ {dep} (not installed)")
             all_installed = False
-    
+
     if not all_installed:
         print("\nInstall missing dependencies:")
         print("  pip install -r requirements.txt")
-    
+
     print(f"\nDependency Status: {'ALL INSTALLED ✓' if all_installed else 'MISSING DEPENDENCIES ✗'}")
-    
+
     return all_installed
 
 
@@ -146,7 +146,7 @@ def print_next_steps():
     print("\n" + "="*80)
     print("NEXT STEPS")
     print("="*80 + "\n")
-    
+
     steps = [
         "1. Install missing dependencies (if any):",
         "   pip install -r requirements.txt",
@@ -170,7 +170,7 @@ def print_next_steps():
         "   - Verify Sharpe ratio > 0.5",
         "   - Ensure IC in range 0.03-0.08",
     ]
-    
+
     for step in steps:
         print(f"  {step}")
 
@@ -180,22 +180,22 @@ def main():
     files_ok = verify_files()
     imports_ok = verify_imports()
     deps_ok = verify_dependencies()
-    
+
     print("\n" + "="*80)
     print("VERIFICATION SUMMARY")
     print("="*80 + "\n")
-    
+
     print(f"  Files:        {'✓ PASS' if files_ok else '✗ FAIL'}")
     print(f"  Imports:      {'✓ PASS' if imports_ok else '✗ FAIL'}")
     print(f"  Dependencies: {'✓ PASS' if deps_ok else '✗ FAIL'}")
-    
+
     overall = files_ok and imports_ok and deps_ok
     print(f"\n  Overall:      {'✓ READY' if overall else '✗ NOT READY'}")
-    
+
     print_next_steps()
-    
+
     print("\n" + "="*80 + "\n")
-    
+
     return 0 if overall else 1
 
 

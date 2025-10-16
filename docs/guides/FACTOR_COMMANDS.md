@@ -272,5 +272,5 @@ print(f"Model R² score: {score:.4f}")
 | COVID validation |  PASS |
 | End-to-end workflow |  PASS |
 
-**All criteria met! Production-ready!** 
+**All criteria met! Production-ready!**
 

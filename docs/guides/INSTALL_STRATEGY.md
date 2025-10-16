@@ -289,11 +289,11 @@ print(f' Generated {len(df_features.columns)} features')
 
 You're ready to proceed when:
 
- `pip install -r requirements-minimal.txt` succeeds  
- `from src.data_pipeline import DataPipeline` works  
- Can fetch real market data  
- Can store data in DuckDB  
- Can generate technical indicators  
+ `pip install -r requirements-minimal.txt` succeeds
+ `from src.data_pipeline import DataPipeline` works
+ Can fetch real market data
+ Can store data in DuckDB
+ Can generate technical indicators
 
 **Everything else is optional enhancement!**
 

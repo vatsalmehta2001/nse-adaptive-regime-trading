@@ -145,8 +145,8 @@ from src.portfolio import PortfolioOptimizer
 
 optimizer = PortfolioOptimizer(risk_free_rate=0.05)
 weights = optimizer.optimize_mean_variance(
-    expected_returns, 
-    cov_matrix, 
+    expected_returns,
+    cov_matrix,
     risk_aversion=1.0,
     constraints={'max_position': 0.1, 'long_only': False}
 )
@@ -353,7 +353,7 @@ cov_matrix = returns_matrix.cov() * 252  # Annualized
 # Optimize
 optimizer = PortfolioOptimizer(risk_free_rate=0.05)
 weights = optimizer.optimize_mean_variance(
-    expected_returns, 
+    expected_returns,
     cov_matrix,
     risk_aversion=1.0,
     constraints={'max_position': 0.1}

@@ -15,8 +15,8 @@ def read_requirements():
     if req_file.exists():
         with open(req_file) as f:
             return [
-                line.strip() 
-                for line in f 
+                line.strip()
+                for line in f
                 if line.strip() and not line.startswith('#') and not line.startswith('=')
             ]
     return []

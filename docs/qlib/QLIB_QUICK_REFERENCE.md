@@ -109,7 +109,7 @@ with open('models/my_model.pkl', 'rb') as f:
 generator = AlphaSignalGenerator(models={'default': model_dict})
 predictions = generator.generate_predictions(factors)
 signals = generator.generate_long_short_signals(
-    predictions, 
+    predictions,
     long_pct=0.2,  # Top 20%
     short_pct=0.2  # Bottom 20%
 )
@@ -124,7 +124,7 @@ optimizer = PortfolioOptimizer(risk_free_rate=0.05)
 
 # Mean-variance
 weights = optimizer.optimize_mean_variance(
-    expected_returns, 
+    expected_returns,
     cov_matrix,
     risk_aversion=1.0,
     constraints={'max_position': 0.1, 'long_only': False}
@@ -132,7 +132,7 @@ weights = optimizer.optimize_mean_variance(
 
 # Max Sharpe
 weights = optimizer.optimize_max_sharpe(
-    expected_returns, 
+    expected_returns,
     cov_matrix,
     constraints={'max_position': 0.1}
 )
@@ -312,7 +312,7 @@ from src.qlib_models import QlibModelTrainer
 
 trainer = QlibModelTrainer(model_type='lightgbm')
 importance_df = trainer.get_feature_importance(
-    model, 
+    model,
     feature_names=X_train.columns.tolist(),
     top_n=20
 )

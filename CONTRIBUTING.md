@@ -287,5 +287,5 @@ Unacceptable behavior may result in being blocked from the project.
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-Thank you for contributing! 
+Thank you for contributing!
 

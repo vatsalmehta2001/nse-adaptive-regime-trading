@@ -5,62 +5,62 @@
 ###  Core Components
 
 1. ** QlibAlpha158 - 158 Institutional-Grade Alpha Factors**
-   - File: `src/feature_engineering/qlib_factors.py` 
+   - File: `src/feature_engineering/qlib_factors.py`
    - **VERIFIED: Exactly 158 factors**
    - Fully vectorized (no loops)
-   - Processing speed: <5s for 500 days 
-   - No NaN after 60-day warmup 
-   - No Inf values 
-   
+   - Processing speed: <5s for 500 days
+   - No NaN after 60-day warmup
+   - No Inf values
+
 2. ** WassersteinRegimeDetector - Market Regime Detection**
    - File: `src/regime_detection/wasserstein_regime.py`
    - 4 regimes: bull, bear, high_volatility, crash
    - COVID crash validation included
    - Wasserstein distance-based clustering
-   
+
 3. ** HMMRegimeDetector - Gaussian Mixture Alternative**
    - File: `src/regime_detection/hmm_regime.py`
    - Uses sklearn.GaussianMixture (hmmlearn alternative)
    - Transition matrix calculation
    - Emission parameters extraction
-   
+
 4. ** FeatureStore - DuckDB Storage**
    - File: `src/feature_engineering/feature_store.py`
    - Tables: `alpha158_factors`, `market_regimes`
    - Efficient indexing and querying
    - UPSERT logic for deduplication
-   
+
 5. ** FactorAnalyzer - IC, Correlation, VIF**
    - File: `src/feature_engineering/factor_analysis.py`
    - Information Coefficient calculation
    - Correlation analysis
    - Variance Inflation Factor
    - Regime-specific IC
-   
+
 6. ** RegimeFeatureEngineer - Regime-Aware Features**
    - File: `src/feature_engineering/regime_features.py`
    - 158 factors + 4 regime dummies + stability features
    - Interaction features (optional)
    - Total: ~244 features
-   
+
 7. ** Pipeline Script - generate_factors.py**
    - File: `scripts/generate_factors.py`
    - End-to-end factor generation
    - Regime detection
    - Factor analysis
    - Progress tracking with tqdm
-   
+
 8. ** Comprehensive Tests**
    - File: `tests/unit/test_factors_and_regimes.py`
    - COVID crash validation
    - Exact factor count verification
    - Speed tests
    - Storage tests
-   
+
 9. ** Configuration**
    - File: `config/factor_config.yaml`
    - Complete configuration for all components
-   
+
 ---
 
 ##  Quick Start
@@ -134,7 +134,7 @@ print(f"Generated {len([c for c in factors.columns if c.startswith('factor_')])}
 
 ---
 
-##  Success Criteria - ALL PASSED 
+##  Success Criteria - ALL PASSED
 
 ### 1.  Exact Factor Count
 ```python
@@ -302,29 +302,29 @@ pytest tests/unit/test_factors_and_regimes.py::TestWassersteinRegime::test_covid
 ### Core Implementation
 ```
 src/feature_engineering/
- qlib_factors.py              # QlibAlpha158 - 158 factors 
- feature_store.py             # DuckDB storage 
- factor_analysis.py           # IC, correlation, VIF 
- regime_features.py           # Regime-aware features 
+ qlib_factors.py              # QlibAlpha158 - 158 factors
+ feature_store.py             # DuckDB storage
+ factor_analysis.py           # IC, correlation, VIF
+ regime_features.py           # Regime-aware features
 
 src/regime_detection/
- wasserstein_regime.py        # Wasserstein clustering 
- hmm_regime.py                # Gaussian Mixture alternative 
- __init__.py                  # Module exports 
+ wasserstein_regime.py        # Wasserstein clustering
+ hmm_regime.py                # Gaussian Mixture alternative
+ __init__.py                  # Module exports
 
 scripts/
- generate_factors.py          # End-to-end pipeline 
+ generate_factors.py          # End-to-end pipeline
 
 config/
- factor_config.yaml           # Configuration 
+ factor_config.yaml           # Configuration
 
 tests/unit/
- test_factors_and_regimes.py  # Comprehensive tests 
+ test_factors_and_regimes.py  # Comprehensive tests
 ```
 
 ### Documentation
 ```
-QLIB_REGIME_IMPLEMENTATION.md    # This file 
+QLIB_REGIME_IMPLEMENTATION.md    # This file
 ```
 
 ---
@@ -416,15 +416,15 @@ regime_detection:
 
 **ALL DELIVERABLES COMPLETE!**
 
- Qlib Alpha-158: **158 institutional-grade factors** (verified)  
- Wasserstein Regime Detection: **4 regimes with COVID validation**  
- HMM Alternative: **Gaussian Mixture implementation**  
- Feature Store: **DuckDB storage with efficient indexing**  
- Factor Analyzer: **IC, correlation, VIF calculations**  
- Regime Features: **~244 combined features**  
- Pipeline: **End-to-end factor generation script**  
- Tests: **Comprehensive test suite with COVID validation**  
- Config: **Complete YAML configuration**  
+ Qlib Alpha-158: **158 institutional-grade factors** (verified)
+ Wasserstein Regime Detection: **4 regimes with COVID validation**
+ HMM Alternative: **Gaussian Mixture implementation**
+ Feature Store: **DuckDB storage with efficient indexing**
+ Factor Analyzer: **IC, correlation, VIF calculations**
+ Regime Features: **~244 combined features**
+ Pipeline: **End-to-end factor generation script**
+ Tests: **Comprehensive test suite with COVID validation**
+ Config: **Complete YAML configuration**
 
-**Your regime-adaptive trading system is ready for ML model training!** 
+**Your regime-adaptive trading system is ready for ML model training!**
 

@@ -1,4 +1,4 @@
-# ⚠️ DEPRECATED FILES
+#  DEPRECATED FILES
 
 This folder contains legacy workarounds that are **no longer needed**.
 
@@ -6,7 +6,7 @@ This folder contains legacy workarounds that are **no longer needed**.
 
 ## run_with_path.sh
 
-**STATUS:** DEPRECATED  
+**STATUS:** DEPRECATED
 **REASON:** Package is now properly installed with `pip install -e .`
 
 ### Old Way (DEPRECATED):
@@ -41,7 +41,7 @@ pip install -e .
 
 ### 3. Verify:
 ```bash
-python -c "from src.data_pipeline import DataPipeline; print('✅ Works!')"
+python -c "from src.data_pipeline import DataPipeline; print(' Works!')"
 ```
 
 ### 4. Remove script calls:

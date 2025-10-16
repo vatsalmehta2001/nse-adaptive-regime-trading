@@ -10,18 +10,18 @@ The NSE Data Pipeline is a production-grade system for fetching, validating, and
 
   OpenBB Client    Fetches data from Yahoo Finance/NSE
 
-         
-         
+
+
 
    Validator       Validates data quality using Pandera
 
-         
-         
+
+
 
   DuckDB Storage   Stores in optimized OLAP database
 
-         
-         
+
+
 
 Technical Indicators  Generates features (optional)
 

@@ -18,27 +18,27 @@ This system integrates four professional-grade technologies to create a complete
 
 ### Key Features
 
- **Data Pipeline**: Professional market data with OpenBB Platform + DuckDB ( OPERATIONAL)  
- **Alpha-158 Factors**: Qlib's 158 institutional-grade alpha factors ( IMPLEMENTED)  
- **Regime Detection**: Wasserstein distance + HMM regime identification ( IMPLEMENTED)  
- **Feature Store**: Efficient DuckDB storage for factors and regimes ( OPERATIONAL)  
- **Factor Analysis**: IC calculation, correlation, VIF analysis ( IMPLEMENTED)  
- **Adaptive Learning**: RL agents (PPO, A2C, DQN) for strategy optimization  
- **Risk Management**: Real-time position sizing and portfolio risk controls  
- **Live Execution**: Automated order placement via Zerodha Kite Connect  
- **Backtesting**: Transaction cost models, slippage simulation, performance analytics  
+- **Data Pipeline**: Professional market data with OpenBB Platform + DuckDB (OPERATIONAL)
+- **Alpha-158 Factors**: Qlib's 158 institutional-grade alpha factors (IMPLEMENTED)
+- **Regime Detection**: Wasserstein distance + HMM regime identification (IMPLEMENTED)
+- **Feature Store**: Efficient DuckDB storage for factors and regimes (OPERATIONAL)
+- **Factor Analysis**: IC calculation, correlation, VIF analysis (IMPLEMENTED)
+- **Adaptive Learning**: RL agents (PPO, A2C, DQN) for strategy optimization
+- **Risk Management**: Real-time position sizing and portfolio risk controls
+- **Live Execution**: Automated order placement via Zerodha Kite Connect
+- **Backtesting**: Transaction cost models, slippage simulation, performance analytics
 
 ### Latest Updates
 
 **Qlib Alpha-158 & Regime Detection - COMPLETE**
--  **158 institutional-grade alpha factors** (verified)
--  **Wasserstein regime detection** (4 regimes: bull/bear/highvol/crash)
--  **Factor analysis toolkit** (IC, correlation, VIF)
--  **Regime-aware feature engineering** (~244 total features)
--  **Production-ready** (all core tests passed)
+- **158 institutional-grade alpha factors** (verified)
+- **Wasserstein regime detection** (4 regimes: bull/bear/highvol/crash)
+- **Factor analysis toolkit** (IC, correlation, VIF)
+- **Regime-aware feature engineering** (~244 total features)
+- **Production-ready** (all core tests passed)
 
-**Performance:** 164x faster than target (0.03s vs 5s for 500 days)  
-**See:** `QLIB_QUICK_START.md` for complete guide  
+**Performance:** 164x faster than target (0.03s vs 5s for 500 days)
+**See:** `QLIB_QUICK_START.md` for complete guide
 
 ## System Architecture
 
@@ -125,7 +125,7 @@ pip install -r requirements.txt
 pip install -e .
 
 # Verify installation
-python -c "from src.data_pipeline import DataPipeline; print('✅ Installation successful')"
+python -c "from src.data_pipeline import DataPipeline; print(' Installation successful')"
 
 # Set up Qlib data (optional - if using Qlib features)
 python scripts/setup_qlib_data.py --market NSE --region IN
@@ -152,7 +152,7 @@ cp .env.example .env
    ```bash
    # Train Qlib models
    python scripts/train_qlib_models.py --config config/qlib_config.yaml
-   
+
    # Train RL agent
    python scripts/train_rl_agent.py --config config/tensortrade_config.yaml
    ```

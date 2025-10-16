@@ -214,7 +214,7 @@ class DataStorageManager:
             symbol_list = ", ".join([f"'{s}'" for s in symbols])
 
             self.connection.execute(f"""
-                DELETE FROM ohlcv 
+                DELETE FROM ohlcv
                 WHERE symbol IN ({symbol_list})
                 AND date >= '{df["date"].min()}'
                 AND date <= '{df["date"].max()}'
@@ -225,9 +225,9 @@ class DataStorageManager:
 
         # Insert with ON CONFLICT handling (upsert)
         self.connection.execute("""
-            INSERT INTO ohlcv 
+            INSERT INTO ohlcv
             SELECT * FROM temp_ohlcv
-            ON CONFLICT (symbol, date) 
+            ON CONFLICT (symbol, date)
             DO UPDATE SET
                 open = EXCLUDED.open,
                 high = EXCLUDED.high,
@@ -388,7 +388,7 @@ class DataStorageManager:
             Dictionary with coverage stats
         """
         query = """
-            SELECT 
+            SELECT
                 MIN(date) as first_date,
                 MAX(date) as last_date,
                 COUNT(*) as total_records,
@@ -419,7 +419,7 @@ class DataStorageManager:
             DataFrame with quality metrics per symbol
         """
         query = """
-            SELECT 
+            SELECT
                 symbol,
                 COUNT(*) as total_records,
                 MIN(date) as first_date,

@@ -16,7 +16,7 @@ from loguru import logger
 class DataQualityReporter:
     """
     Generate data quality reports.
-    
+
     Features:
     - Comprehensive quality metrics
     - Quality scoring (0-100)
@@ -24,19 +24,19 @@ class DataQualityReporter:
     - Multi-format export (JSON, CSV, HTML)
     - Cross-symbol comparison
     """
-    
+
     def __init__(self, output_dir: str = "reports/data_quality"):
         """
         Initialize quality reporter.
-        
+
         Args:
             output_dir: Directory for saving reports
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         logger.info(f"DataQualityReporter initialized: {self.output_dir}")
-    
+
     def generate_quality_report(
         self,
         df: pd.DataFrame,
@@ -46,18 +46,18 @@ class DataQualityReporter:
     ) -> Dict[str, Any]:
         """
         Generate comprehensive quality report.
-        
+
         Args:
             df: Cleaned DataFrame
             audit_trail: Audit information from cleaning
             symbol: Symbol identifier
             formats: List of output formats ('json', 'csv', 'html')
-            
+
         Returns:
             Quality metrics dictionary
         """
         logger.info(f"Generating quality report for {symbol}...")
-        
+
         report = {
             'symbol': symbol,
             'timestamp': pd.Timestamp.now().isoformat(),
@@ -76,57 +76,57 @@ class DataQualityReporter:
             'extreme_values': audit_trail.get('filtered_by_symbol', {}),
             'data_issues': self._identify_issues(df)
         }
-        
+
         # Calculate quality score (0-100)
         report['quality_score'] = self._calculate_quality_score(report)
         report['quality_grade'] = self._get_quality_grade(report['quality_score'])
-        
+
         # Save report
         self._save_report(report, symbol)
-        
+
         # Generate HTML if requested
         if 'html' in formats:
             self.generate_html_report(report, symbol)
-        
+
         logger.info(f"Quality Score: {report['quality_score']:.1f}/100 ({report['quality_grade']})")
-        
+
         return report
-    
+
     def _check_missing_data(self, df: pd.DataFrame) -> Dict:
         """
         Check for missing data points.
-        
+
         Args:
             df: DataFrame to check
-            
+
         Returns:
             Missing data metrics
         """
         if 'date' not in df.columns:
             return {'completeness': 1.0}
-        
+
         expected_days = (df['date'].max() - df['date'].min()).days
         actual_days = len(df['date'].unique())
-        
+
         return {
             'expected_days': expected_days,
             'actual_days': actual_days,
             'missing_days': max(0, expected_days - actual_days),
             'completeness': actual_days / expected_days if expected_days > 0 else 0.0
         }
-    
+
     def _identify_issues(self, df: pd.DataFrame) -> List[Dict]:
         """
         Identify specific data quality issues.
-        
+
         Args:
             df: DataFrame to check
-            
+
         Returns:
             List of identified issues
         """
         issues = []
-        
+
         # Check for zero volume days
         if 'volume' in df.columns:
             zero_vol = (df['volume'] == 0).sum()
@@ -137,13 +137,13 @@ class DataQualityReporter:
                     'severity': 'low',
                     'description': f"{zero_vol} days with zero volume"
                 })
-        
+
         # Check for constant prices
         if 'close' in df.columns and 'symbol' in df.columns:
             df_temp = df.copy()
             df_temp['price_change'] = df_temp.groupby('symbol')['close'].diff()
             constant_price = (df_temp['price_change'] == 0).sum()
-            
+
             if constant_price > 5:
                 issues.append({
                     'type': 'constant_price',
@@ -151,12 +151,12 @@ class DataQualityReporter:
                     'severity': 'medium',
                     'description': f"{constant_price} days with no price change"
                 })
-        
+
         # Check for suspicious patterns (volume drops)
         if 'volume' in df.columns and len(df) > 40:
             recent_vol = df.tail(20)['volume'].mean()
             older_vol = df.head(20)['volume'].mean()
-            
+
             if older_vol > 0 and recent_vol < older_vol * 0.1:
                 issues.append({
                     'type': 'volume_drop',
@@ -167,7 +167,7 @@ class DataQualityReporter:
                         'historical_volume': float(older_vol)
                     }
                 })
-        
+
         # Check for NaN values
         nan_counts = df.isnull().sum()
         if nan_counts.sum() > 0:
@@ -178,29 +178,29 @@ class DataQualityReporter:
                 'description': f"{nan_counts.sum()} missing values across columns",
                 'details': nan_counts[nan_counts > 0].to_dict()
             })
-        
+
         return issues
-    
+
     def _calculate_quality_score(self, report: Dict) -> float:
         """
         Calculate overall quality score (0-100).
-        
+
         Args:
             report: Quality report dictionary
-            
+
         Returns:
             Quality score (0-100)
         """
         score = 100.0
-        
+
         # Deduct for low retention (up to -20 points)
         retention = report['data_quality']['retention_rate']
         score -= (1 - retention) * 20
-        
+
         # Deduct for missing data (up to -30 points)
         completeness = report['missing_data'].get('completeness', 1.0)
         score -= (1 - completeness) * 30
-        
+
         # Deduct for data issues
         for issue in report['data_issues']:
             severity_deductions = {
@@ -209,16 +209,16 @@ class DataQualityReporter:
                 'high': 20
             }
             score -= severity_deductions.get(issue.get('severity', 'low'), 0)
-        
+
         return max(0.0, min(100.0, score))
-    
+
     def _get_quality_grade(self, score: float) -> str:
         """
         Convert quality score to grade.
-        
+
         Args:
             score: Quality score (0-100)
-            
+
         Returns:
             Quality grade
         """
@@ -230,22 +230,22 @@ class DataQualityReporter:
             return "ACCEPTABLE"
         else:
             return "POOR"
-    
+
     def _save_report(self, report: Dict, symbol: str):
         """
         Save report to JSON and CSV.
-        
+
         Args:
             report: Quality report
             symbol: Symbol identifier
         """
         timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
-        
+
         # JSON report (full details)
         json_path = self.output_dir / f"quality_report_{symbol}_{timestamp}.json"
         with open(json_path, 'w') as f:
             json.dump(report, f, indent=2, default=str)
-        
+
         # CSV summary
         summary = {
             'symbol': symbol,
@@ -257,24 +257,24 @@ class DataQualityReporter:
             'issues_count': len(report['data_issues']),
             'total_rows': report['data_quality']['total_rows']
         }
-        
+
         csv_path = self.output_dir / f"quality_summary_{symbol}_{timestamp}.csv"
         pd.DataFrame([summary]).to_csv(csv_path, index=False)
-        
+
         logger.info(f"Quality report saved: {json_path}")
-    
+
     def generate_comparison_report(self, reports: List[Dict]) -> pd.DataFrame:
         """
         Compare quality across multiple symbols.
-        
+
         Args:
             reports: List of quality reports
-            
+
         Returns:
             DataFrame with comparison metrics
         """
         logger.info(f"Generating comparison report for {len(reports)} symbols...")
-        
+
         comparison = pd.DataFrame([
             {
                 'symbol': r['symbol'],
@@ -287,9 +287,9 @@ class DataQualityReporter:
             }
             for r in reports
         ])
-        
+
         comparison = comparison.sort_values('quality_score', ascending=False)
-        
+
         # Calculate summary statistics
         summary_stats = {
             'total_symbols': len(comparison),
@@ -299,71 +299,71 @@ class DataQualityReporter:
             'acceptable_count': ((comparison['quality_score'] >= 60) & (comparison['quality_score'] < 75)).sum(),
             'poor_count': (comparison['quality_score'] < 60).sum()
         }
-        
+
         logger.info(f"Quality Summary: {summary_stats['excellent_count']} excellent, "
                    f"{summary_stats['good_count']} good, {summary_stats['acceptable_count']} acceptable, "
                    f"{summary_stats['poor_count']} poor")
-        
+
         # Save
         timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
         comparison_path = self.output_dir / f"comparison_report_{timestamp}.csv"
         comparison.to_csv(comparison_path, index=False)
-        
+
         stats_path = self.output_dir / f"summary_stats_{timestamp}.json"
         with open(stats_path, 'w') as f:
             json.dump(summary_stats, f, indent=2, default=int)
-        
+
         logger.info(f"Comparison report saved: {comparison_path}")
-        
+
         return comparison
-    
+
     def print_quality_summary(self, report: Dict):
         """
         Print human-readable quality summary.
-        
+
         Args:
             report: Quality report dictionary
         """
         print("\n" + "="*80)
         print(f"DATA QUALITY REPORT: {report['symbol']}")
         print("="*80)
-        
+
         print(f"\nQuality Score: {report['quality_score']:.1f}/100 ({report['quality_grade']})")
-        
+
         print("\nDATA STATISTICS:")
         print(f"  Total Rows:      {report['data_quality']['total_rows']:,}")
         print(f"  Filtered Rows:   {report['data_quality']['filtered_rows']:,}")
         print(f"  Retention Rate:  {report['data_quality']['retention_rate']*100:.1f}%")
         print(f"  Completeness:    {report['missing_data'].get('completeness', 0)*100:.1f}%")
-        
+
         if report['data_range']['start']:
             print(f"\nDATE RANGE:")
             print(f"  Start: {report['data_range']['start']}")
             print(f"  End:   {report['data_range']['end']}")
             print(f"  Days:  {report['data_range']['total_days']}")
-        
+
         if report['extreme_values']:
             print(f"\nEXTREME VALUES FILTERED:")
             for symbol, details in report['extreme_values'].items():
                 print(f"  {symbol}: {details['count']} dates")
                 print(f"    Max: {details['max_return']*100:+.1f}%, Min: {details['min_return']*100:+.1f}%")
-        
+
         if report['data_issues']:
             print(f"\nDATA ISSUES ({len(report['data_issues'])}):")
             for issue in report['data_issues']:
-                severity_icon = {"low": "ℹ️", "medium": "⚠️", "high": "🚨"}.get(issue['severity'], "•")
+                severity_icon = {"low": "[INFO]", "medium": "[WARN]", "high": "[ERROR]"}.get(issue['severity'], "[-]")
                 print(f"  {severity_icon} [{issue['severity'].upper()}] {issue['type']}: {issue.get('description', 'N/A')}")
-        
+
         print("\n" + "="*80 + "\n")
-    
+
     def generate_html_report(self, report: Dict, symbol: str) -> str:
         """
         Generate HTML quality report.
-        
+
         Args:
             report: Quality report dictionary
             symbol: Symbol identifier
-            
+
         Returns:
             Path to saved HTML file
         """
@@ -397,12 +397,12 @@ class DataQualityReporter:
     <div class="container">
         <h1>Data Quality Report: {symbol}</h1>
         <p><strong>Generated:</strong> {timestamp}</p>
-        
+
         <div class="score {grade_class}">
             {quality_score:.1f} / 100
             <div style="font-size: 20px; margin-top: 10px;">{quality_grade}</div>
         </div>
-        
+
         <h2>Key Metrics</h2>
         <div>
             <div class="metric">
@@ -422,20 +422,20 @@ class DataQualityReporter:
                 <div class="metric-label">Filtered Rows</div>
             </div>
         </div>
-        
+
         <h2>Date Range</h2>
         <p><strong>Start:</strong> {date_start} | <strong>End:</strong> {date_end} | <strong>Days:</strong> {total_days}</p>
-        
+
         {extreme_values_section}
         {issues_section}
     </div>
 </body>
 </html>
         """
-        
+
         # Format grade class
         grade_class = report['quality_grade'].lower()
-        
+
         # Format extreme values section
         extreme_values_section = ""
         if report['extreme_values']:
@@ -443,7 +443,7 @@ class DataQualityReporter:
             for sym, details in report['extreme_values'].items():
                 extreme_values_section += f"<tr><td>{sym}</td><td>{details['count']}</td><td>{details['max_return']*100:+.2f}%</td><td>{details['min_return']*100:+.2f}%</td></tr>"
             extreme_values_section += "</table>"
-        
+
         # Format issues section
         issues_section = ""
         if report['data_issues']:
@@ -452,7 +452,7 @@ class DataQualityReporter:
                 severity_class = f"issue-{issue['severity']}"
                 issues_section += f"<tr class='{severity_class}'><td>{issue['severity'].upper()}</td><td>{issue['type']}</td><td>{issue.get('description', 'N/A')}</td></tr>"
             issues_section += "</table>"
-        
+
         # Fill template
         html_content = html_template.format(
             symbol=report['symbol'],
@@ -470,14 +470,14 @@ class DataQualityReporter:
             extreme_values_section=extreme_values_section,
             issues_section=issues_section
         )
-        
+
         # Save HTML file
         timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
         html_path = self.output_dir / f"quality_report_{symbol}_{timestamp}.html"
-        
+
         with open(html_path, 'w') as f:
             f.write(html_content)
-        
+
         logger.info(f"HTML report saved: {html_path}")
         return str(html_path)
 

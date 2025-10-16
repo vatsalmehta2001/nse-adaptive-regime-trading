@@ -119,7 +119,7 @@ print(ic_df.nlargest(10, 'abs_mean_ic')[['factor', 'ic_5d', 'mean_ic']])
 
 ##  Verification Results
 
-### End-to-End Test with Real Data 
+### End-to-End Test with Real Data
 ```
  Loaded 494 rows for RELIANCE
  Generated 158 factors in 0.03s
@@ -131,7 +131,7 @@ print(ic_df.nlargest(10, 'abs_mean_ic')[['factor', 'ic_5d', 'mean_ic']])
  Retrieved 494 rows from database
 ```
 
-**Result: ALL TESTS PASSED** 
+**Result: ALL TESTS PASSED**
 
 ---
 
@@ -235,25 +235,25 @@ pytest tests/unit/test_factors_and_regimes.py::TestWassersteinRegime::test_covid
 ### Implementation Files
 ```
 src/feature_engineering/
- qlib_factors.py          # 158 alpha factors 
- feature_store.py         # DuckDB storage 
- factor_analysis.py       # IC, correlation, VIF 
- regime_features.py       # Regime-aware features 
- __init__.py              # Updated exports 
+ qlib_factors.py          # 158 alpha factors
+ feature_store.py         # DuckDB storage
+ factor_analysis.py       # IC, correlation, VIF
+ regime_features.py       # Regime-aware features
+ __init__.py              # Updated exports
 
 src/regime_detection/
- wasserstein_regime.py    # Wasserstein clustering 
- hmm_regime.py            # Gaussian Mixture 
- __init__.py              # Module exports 
+ wasserstein_regime.py    # Wasserstein clustering
+ hmm_regime.py            # Gaussian Mixture
+ __init__.py              # Module exports
 
 scripts/
- generate_factors.py      # Pipeline script 
+ generate_factors.py      # Pipeline script
 
 config/
- factor_config.yaml       # Configuration 
+ factor_config.yaml       # Configuration
 
 tests/unit/
- test_factors_and_regimes.py  # Tests 
+ test_factors_and_regimes.py  # Tests
 ```
 
 ### Documentation
@@ -376,11 +376,11 @@ print(f"R² Score: {score:.4f}")
 | Calculate IC | ~1s | 158 factors |
 | Regime detection | ~5s | 500 days |
 
-**All performance targets met!** 
+**All performance targets met!**
 
 ---
 
-##  Success Criteria - ALL MET 
+##  Success Criteria - ALL MET
 
 | Criterion | Target | Result | Status |
 |-----------|--------|--------|--------|
@@ -415,7 +415,7 @@ print(f'Retrieved {len(factors)} rows with {len(factors.columns)} columns')
 "
 ```
 
-**All components are production-ready for institutional-grade quantitative research!** 
+**All components are production-ready for institutional-grade quantitative research!**
 
 ---
 
@@ -427,5 +427,5 @@ print(f'Retrieved {len(factors)} rows with {len(factors.columns)} columns')
 
 ---
 
-**Ready for ML model training and strategy development!** 
+**Ready for ML model training and strategy development!**
 

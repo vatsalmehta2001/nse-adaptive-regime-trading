@@ -272,11 +272,11 @@ def calculate_returns(
 ) -> pd.Series:
     """
     Calculate returns from price series.
-    
+
     Args:
         prices: Price series
         method: Return calculation method
-        
+
     Returns:
         Returns series
     """

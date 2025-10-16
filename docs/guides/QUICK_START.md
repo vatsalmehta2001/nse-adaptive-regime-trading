@@ -327,5 +327,5 @@ python -c "from src.utils.database import get_database; get_database().initializ
 - Issues: GitHub Issues
 - Email: your.email@example.com
 
-Happy Trading! 
+Happy Trading!
 
