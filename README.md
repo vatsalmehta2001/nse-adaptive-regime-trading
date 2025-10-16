@@ -208,27 +208,27 @@ python scripts/run_live_trading.py --mode live --confirm
 - **pytest** (8.2.1): Testing framework
 - **Loguru** (0.7.2): Structured logging
 
-##  Performance Metrics (Placeholder)
+##  Performance Metrics
 
 > **Note**: The following metrics will be updated with live system performance
 
 ### Backtest Results (2023-2024)
 | Metric | Value |
 |--------|-------|
-| Annual Return | TBD |
-| Sharpe Ratio | TBD |
-| Max Drawdown | TBD |
-| Win Rate | TBD |
-| Profit Factor | TBD |
-| Sortino Ratio | TBD |
+| Annual Return | - |
+| Sharpe Ratio | - |
+| Max Drawdown | - |
+| Win Rate | - |
+| Profit Factor | - |
+| Sortino Ratio | - |
 
 ### Live Trading (Paper Trading)
 | Metric | Value |
 |--------|-------|
-| Days Trading | TBD |
-| Total Trades | TBD |
-| Avg Trade Duration | TBD |
-| Current Drawdown | TBD |
+| Days Trading | - |
+| Total Trades | - |
+| Avg Trade Duration | - |
+| Current Drawdown | - |
 
 ##  Project Structure
 
