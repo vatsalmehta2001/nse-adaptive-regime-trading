@@ -351,4 +351,4 @@ For questions or collaboration opportunities:
 
 ---
 
-**Built with  for the quantitative trading community**
+**Built with ❤️ for the quantitative trading community**
