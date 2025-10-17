@@ -128,10 +128,14 @@ class PaperTradingBroker(BrokerInterface):
             # Get current market price
             try:
                 ltp = self.data_broker.get_ltp(order.symbol, order.exchange)
+                # Handle None or invalid LTP
+                if ltp is None or not isinstance(ltp, (int, float)) or ltp <= 0:
+                    raise ValueError(f"Invalid LTP: {ltp}")
             except Exception as e:
                 logger.error(f"Failed to get LTP for {order.symbol}: {e}")
                 # Use dummy price if data fetch fails
                 ltp = order.price if order.price else 100.0
+                logger.warning(f"Using fallback price {ltp} for {order.symbol}")
 
             # Check if we have enough cash for buy orders
             if order.side == OrderSide.BUY:

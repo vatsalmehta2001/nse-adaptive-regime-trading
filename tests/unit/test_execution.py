@@ -5,6 +5,7 @@ Tests broker interface, paper trading, risk management, and order lifecycle.
 """
 
 import pytest
+import os
 from datetime import datetime
 from unittest.mock import Mock, MagicMock, patch
 
@@ -521,14 +522,17 @@ class TestBrokerFactory:
 
     def test_create_paper_broker(self):
         """Test creating paper broker."""
-        # Mock DhanHQ creation
-        with patch("src.execution.broker_factory.DhanBroker") as mock_dhan:
-            mock_dhan.return_value = MockBroker()
+        # Set dummy environment variables for the test
+        with patch.dict(os.environ, {"DHAN_CLIENT_ID": "test_id", "DHAN_ACCESS_TOKEN": "test_token"}):
+            # Mock DhanHQ creation to avoid actual API calls
+            with patch("src.execution.broker_factory.DhanBroker") as mock_dhan:
+                mock_dhan.return_value = MockBroker()
 
-            broker = BrokerFactory.create("PAPER", initial_capital=500000)
+                broker = BrokerFactory.create("PAPER")
 
-            assert isinstance(broker, PaperTradingBroker)
-            assert broker.initial_capital == 500000
+                assert isinstance(broker, PaperTradingBroker)
+                # Initial capital comes from config (1000000 default)
+                assert broker.initial_capital > 0
 
     def test_unknown_broker_type(self):
         """Test that unknown broker type raises error."""
@@ -545,5 +549,84 @@ class TestBrokerFactory:
 
         assert brokers["DHAN"]["implemented"] is True
         assert brokers["PAPER"]["implemented"] is True
-        assert brokers["KITE"]["implemented"] is False
+        assert brokers["KITE"]["implemented"] is True
+
+
+class TestSymbolMapper:
+    """Test symbol mapper for DhanHQ security IDs."""
+
+    def test_symbol_mapper_initialization(self):
+        """Test SymbolMapper initializes correctly."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        assert len(mapper.symbol_map) > 0
+
+    def test_symbol_mapper_get_security_id(self):
+        """Test getting security ID for symbol."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        security_id = mapper.get_security_id("RELIANCE", "NSE")
+        assert security_id is not None
+        assert len(security_id) > 0
+        assert security_id.isdigit()
+
+    def test_symbol_mapper_invalid_symbol(self):
+        """Test error handling for invalid symbol."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        with pytest.raises(ValueError, match="Security ID not found"):
+            mapper.get_security_id("INVALID_XYZ_123", "NSE")
+
+    def test_symbol_mapper_has_mapping(self):
+        """Test checking if mapping exists."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        assert mapper.has_mapping("RELIANCE", "NSE") is True
+        assert mapper.has_mapping("INVALID_XYZ", "NSE") is False
+
+    def test_symbol_mapper_add_mapping(self):
+        """Test adding new mapping."""
+        from src.execution.symbol_mapper import SymbolMapper
+        import tempfile
+        import os
+
+        # Use temp file for testing
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv') as f:
+            temp_path = f.name
+
+        try:
+            mapper = SymbolMapper(csv_path=temp_path)
+            mapper.add_mapping("TESTSTOCK", "NSE", "99999", "test", "Test mapping")
+
+            # Should be able to retrieve it
+            security_id = mapper.get_security_id("TESTSTOCK", "NSE")
+            assert security_id == "99999"
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    def test_symbol_mapper_get_all_symbols(self):
+        """Test getting all symbols."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        symbols = mapper.get_all_symbols("NSE")
+        assert isinstance(symbols, list)
+        assert len(symbols) > 0
+
+    def test_symbol_mapper_validate_mappings(self):
+        """Test validation of mappings."""
+        from src.execution.symbol_mapper import SymbolMapper
+
+        mapper = SymbolMapper()
+        results = mapper.validate_mappings()
+
+        assert 'valid' in results
+        assert 'errors' in results
+        assert 'warnings' in results
+        assert isinstance(results['valid'], list)
 

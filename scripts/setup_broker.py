@@ -16,10 +16,68 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import os
+from datetime import datetime
 from src.execution.broker_factory import BrokerFactory
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
+
+
+def validate_credentials(client_id: str, access_token: str, mode: str = "SANDBOX") -> bool:
+    """
+    Validate DhanHQ credentials before saving.
+
+    Args:
+        client_id: DhanHQ client ID
+        access_token: DhanHQ access token
+        mode: SANDBOX or LIVE
+
+    Returns:
+        True if valid, False otherwise
+    """
+    # Check format
+    if not client_id or not access_token:
+        print("❌ Client ID and access token are required")
+        return False
+
+    if len(client_id) < 5:
+        print("❌ Client ID seems too short (minimum 5 characters)")
+        return False
+
+    if len(access_token) < 10:
+        print("❌ Access token seems too short (minimum 10 characters)")
+        return False
+
+    # Test connection
+    print(f"\n🔄 Testing {mode} credentials...")
+    try:
+        broker = BrokerFactory.create(
+            "DHAN",
+            mode=mode,
+            client_id=client_id,
+            access_token=access_token
+        )
+
+        if broker.authenticate():
+            print(f"✅ {mode} credentials validated successfully!")
+
+            # Try to fetch balance
+            try:
+                balance = broker.get_account_balance()
+                print(f"📊 Account balance: ₹{balance.total_balance:,.2f}")
+                print(f"💰 Available cash: ₹{balance.available_cash:,.2f}")
+                return True
+            except Exception as e:
+                print(f"⚠️  Could not fetch balance: {e}")
+                print("✅ Authentication works, but API may be limited")
+                return True
+        else:
+            print("❌ Authentication failed - please check your credentials")
+            return False
+
+    except Exception as e:
+        print(f"❌ Connection error: {e}")
+        return False
 
 
 def setup_dhan_sandbox() -> bool:
@@ -35,70 +93,54 @@ def setup_dhan_sandbox() -> bool:
 
     print("\nSteps to get DhanHQ sandbox credentials:")
     print("1. Visit: https://developer.dhanhq.co")
-    print("2. Sign up (no Dhan account needed)")
-    print("3. Get your client ID and access token")
-    print("4. Sandbox gives virtual capital (resets daily)")
+    print("2. Sign up (no Dhan account needed!)")
+    print("3. Navigate to 'API Credentials' section")
+    print("4. Get your client ID and access token")
+    print("5. Sandbox provides ₹10 lakhs virtual capital")
     print()
 
-    client_id = input("Enter your DhanHQ client ID: ").strip()
-    access_token = input("Enter your DhanHQ access token: ").strip()
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        print(f"\n📝 Attempt {attempt + 1}/{max_attempts}")
+        client_id = input("Enter your DhanHQ client ID: ").strip()
+        access_token = input("Enter your DhanHQ access token: ").strip()
 
-    if not client_id or not access_token:
-        print("\nError: Both client ID and access token are required")
-        return False
+        if validate_credentials(client_id, access_token, "SANDBOX"):
+            # Save to .env file
+            env_path = Path(".env")
+            env_exists = env_path.exists()
 
-    # Save to .env file
-    env_path = Path(".env")
-    env_exists = env_path.exists()
+            with open(env_path, "a") as f:
+                if not env_exists:
+                    f.write("# Environment variables for NSE trading system\n")
+                f.write(f"\n# DhanHQ Sandbox Credentials (added {datetime.now().strftime('%Y-%m-%d %H:%M:%S')})\n")
+                f.write(f"DHAN_CLIENT_ID={client_id}\n")
+                f.write(f"DHAN_ACCESS_TOKEN={access_token}\n")
 
-    with open(env_path, "a") as f:
-        if not env_exists:
-            f.write("# Environment variables for NSE trading system\n")
-        f.write(f"\n# DhanHQ Sandbox Credentials (added {os.popen('date').read().strip()})\n")
-        f.write(f"DHAN_CLIENT_ID={client_id}\n")
-        f.write(f"DHAN_ACCESS_TOKEN={access_token}\n")
+            print(f"\n✅ Credentials saved to {env_path}")
 
-    print(f"\nCredentials saved to {env_path}")
-
-    # Also add to .gitignore if not already there
-    gitignore_path = Path(".gitignore")
-    if gitignore_path.exists():
-        with open(gitignore_path, "r") as f:
-            content = f.read()
-        if ".env" not in content:
-            with open(gitignore_path, "a") as f:
-                f.write("\n# Environment variables\n.env\n")
-            print("Added .env to .gitignore")
-
-    # Test connection
-    print("\nTesting connection...")
-    try:
-        broker = BrokerFactory.create(
-            "DHAN",
-            mode="SANDBOX",
-            client_id=client_id,
-            access_token=access_token,
-        )
-
-        if broker.authenticate():
-            print("DhanHQ sandbox connection successful")
-
-            # Get account info
-            try:
-                balance = broker.get_account_balance()
-                print(f"\nAccount balance: ₹{balance.total_balance:,.2f}")
-                print(f"Available cash: ₹{balance.available_cash:,.2f}")
-            except Exception as e:
-                logger.warning(f"Could not fetch balance: {e}")
+            # Also add to .gitignore if not already there
+            gitignore_path = Path(".gitignore")
+            if gitignore_path.exists():
+                with open(gitignore_path, "r") as f:
+                    content = f.read()
+                if ".env" not in content:
+                    with open(gitignore_path, "a") as f:
+                        f.write("\n# Environment variables\n.env\n")
+                    print("📝 Added .env to .gitignore")
 
             return True
         else:
-            print("Authentication failed. Please check your credentials.")
-            return False
+            if attempt < max_attempts - 1:
+                print("\n⚠️  Validation failed. Please check your credentials and try again.")
+                retry = input("Retry? (y/n): ").strip().lower()
+                if retry != 'y':
+                    return False
+            else:
+                print("\n❌ Setup failed after 3 attempts")
+                return False
 
-    except Exception as e:
-        print(f"Connection error: {e}")
-        return False
+    return False
 
 
 def setup_dhan_live() -> bool:
@@ -126,57 +168,43 @@ def setup_dhan_live() -> bool:
         return False
 
     print("\nSteps to get DhanHQ live credentials:")
-    print("1. Login to your Dhan account")
-    print("2. Go to Settings > API")
+    print("1. Login to your Dhan demat account at https://dhan.co")
+    print("2. Navigate to Settings > API Access")
     print("3. Generate API credentials")
-    print("4. Note your client ID and access token")
+    print("4. Copy your client ID and access token")
+    print()
+    print("⚠️  Note: Live API access may require additional verification")
     print()
 
-    client_id = input("Enter your DhanHQ client ID: ").strip()
-    access_token = input("Enter your DhanHQ access token: ").strip()
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        print(f"\n📝 Attempt {attempt + 1}/{max_attempts}")
+        client_id = input("Enter your DhanHQ LIVE client ID: ").strip()
+        access_token = input("Enter your DhanHQ LIVE access token: ").strip()
 
-    if not client_id or not access_token:
-        print("\nError: Both client ID and access token are required")
-        return False
+        if validate_credentials(client_id, access_token, "LIVE"):
+            # Save to .env
+            env_path = Path(".env")
+            with open(env_path, "a") as f:
+                f.write(f"\n# DhanHQ Live Credentials (added {datetime.now().strftime('%Y-%m-%d %H:%M:%S')})\n")
+                f.write(f"DHAN_LIVE_CLIENT_ID={client_id}\n")
+                f.write(f"DHAN_LIVE_ACCESS_TOKEN={access_token}\n")
 
-    # Save to .env
-    env_path = Path(".env")
-    with open(env_path, "a") as f:
-        f.write(f"\n# DhanHQ Live Credentials (added {os.popen('date').read().strip()})\n")
-        f.write(f"DHAN_LIVE_CLIENT_ID={client_id}\n")
-        f.write(f"DHAN_LIVE_ACCESS_TOKEN={access_token}\n")
-
-    print(f"\nLive credentials saved to {env_path}")
-
-    # Test connection
-    print("\nTesting live connection...")
-    try:
-        broker = BrokerFactory.create(
-            "DHAN",
-            mode="LIVE",
-            client_id=client_id,
-            access_token=access_token,
-        )
-
-        if broker.authenticate():
-            print("DhanHQ live connection successful")
-
-            # Get account info
-            try:
-                balance = broker.get_account_balance()
-                print(f"\nAccount balance: ₹{balance.total_balance:,.2f}")
-                print(f"Available cash: ₹{balance.available_cash:,.2f}")
-            except Exception as e:
-                logger.warning(f"Could not fetch balance: {e}")
+            print(f"\n✅ Live credentials saved to {env_path}")
+            print("\n⚠️  IMPORTANT: Test extensively with small amounts before scaling up!")
 
             return True
         else:
-            print("Authentication failed. Please check your credentials.")
-            return False
+            if attempt < max_attempts - 1:
+                print("\n⚠️  Validation failed. Please check your credentials and try again.")
+                retry = input("Retry? (y/n): ").strip().lower()
+                if retry != 'y':
+                    return False
+            else:
+                print("\n❌ Setup failed after 3 attempts")
+                return False
 
-    except Exception as e:
-        print(f"Connection error: {e}")
-        return False
+    return False
 
 
 def setup_paper_trading() -> bool:

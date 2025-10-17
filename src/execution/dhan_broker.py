@@ -640,8 +640,8 @@ class DhanBroker(BrokerInterface):
         """
         Get DhanHQ security ID for symbol.
 
-        Note: This is a simplified implementation. For production use,
-        maintain a proper symbol-to-security_id mapping database.
+        For sandbox mode, uses hardcoded IDs. For live mode, uses SymbolMapper
+        to fetch security IDs from CSV mapping file.
 
         Args:
             symbol: Trading symbol
@@ -651,7 +651,7 @@ class DhanBroker(BrokerInterface):
             Security ID string
 
         Raises:
-            NotImplementedError: For live mode without proper mapping
+            ValueError: For live mode if symbol mapping not found
         """
         if self.mode == "SANDBOX":
             # Sandbox uses dummy security IDs
@@ -661,16 +661,31 @@ class DhanBroker(BrokerInterface):
                 "TCS": "11536",
                 "INFY": "1594",
                 "HDFCBANK": "1333",
+                "ICICIBANK": "4963",
             }
             security_id = sandbox_ids.get(symbol, "1333")
             logger.debug(f"Using sandbox security ID {security_id} for {symbol}")
             return security_id
         else:
-            # For live mode, need proper security ID lookup
-            raise NotImplementedError(
-                f"Security ID lookup not implemented for LIVE mode. "
-                f"Please implement symbol-to-security_id mapping for {symbol}"
-            )
+            # For live mode, use SymbolMapper
+            if not hasattr(self, '_symbol_mapper'):
+                from src.execution.symbol_mapper import SymbolMapper
+                self._symbol_mapper = SymbolMapper()
+                logger.info("Initialized SymbolMapper for live trading")
+
+            try:
+                security_id = self._symbol_mapper.get_security_id(symbol, exchange)
+                logger.debug(f"Found security ID {security_id} for {symbol} ({exchange})")
+                return security_id
+            except ValueError as e:
+                logger.error(
+                    f"Security ID not found for {symbol} on {exchange}. "
+                    f"Run: python scripts/update_symbol_mappings.py --symbol {symbol} --security-id <ID>"
+                )
+                raise ValueError(
+                    f"Cannot trade {symbol} in LIVE mode without security ID mapping. "
+                    f"Please add mapping using: python scripts/update_symbol_mappings.py"
+                ) from e
 
     def _parse_order_response(self, order_data: Dict) -> Order:
         """

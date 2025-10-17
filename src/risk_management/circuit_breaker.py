@@ -326,7 +326,10 @@ class CircuitBreaker:
             (datetime.now() - oldest_trade["timestamp"]).total_seconds() / 3600
         )
 
-        if time_span_hours == 0:
+        # Require at least 5 minutes of data to calculate velocity
+        # This prevents false triggers on single trades
+        min_time_span_hours = 5.0 / 60.0  # 5 minutes
+        if time_span_hours < min_time_span_hours:
             return 0.0
 
         # Extrapolate to hourly rate

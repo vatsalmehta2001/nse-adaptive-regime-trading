@@ -156,6 +156,15 @@ class RiskController:
 
         # Check 3: Position size limit
         order_value = self._estimate_order_value(order, current_price)
+        
+        # Handle zero or negative portfolio value
+        if portfolio_value <= 0:
+            self._log_violation(
+                "invalid_portfolio_value",
+                f"Portfolio value is {portfolio_value}, cannot validate order"
+            )
+            return False, f"Invalid portfolio value: {portfolio_value}"
+        
         position_size_pct = (order_value / portfolio_value) * 100
 
         if position_size_pct > self.limits.max_position_size_pct:
