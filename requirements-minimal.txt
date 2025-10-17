@@ -9,6 +9,8 @@ openbb>=4.5.0                    # Market data platform
 pandas>=2.2.0                    # Data manipulation
 numpy>=1.26.0,<2.0.0             # Numerical computing
 duckdb>=0.10.0                   # Database storage
+dhanhq==2.0.2                    # DhanHQ broker integration (latest)
+kiteconnect==5.0.1               # Kite Connect broker API (latest)
 
 # =============================================================================
 # Data Validation & Configuration

@@ -1,0 +1,77 @@
+# Broker Configuration
+# Switch between brokers by changing 'active_broker'
+
+active_broker: "PAPER"  # Options: DHAN, KITE, PAPER
+
+brokers:
+  dhan:
+    # DhanHQ credentials (use environment variables for security)
+    client_id: "${DHAN_CLIENT_ID}"        # From environment variable
+    access_token: "${DHAN_ACCESS_TOKEN}"  # From environment variable
+    mode: "SANDBOX"                        # SANDBOX or LIVE
+    
+    # API connection settings
+    connection:
+      timeout: 7                  # Seconds
+      max_retries: 3              # Retry attempts
+      retry_delay: 1.0            # Seconds between retries
+    
+    # Order defaults
+    defaults:
+      exchange: "NSE"
+      product: "MIS"              # MIS (intraday), CNC (delivery), NRML (F&O)
+      validity: "DAY"             # DAY or IOC
+  
+  kite:
+    # Kite Connect credentials (get from https://kite.trade/connect/login)
+    api_key: "${KITE_API_KEY}"
+    api_secret: "${KITE_API_SECRET}"
+    access_token: "${KITE_ACCESS_TOKEN}"
+    
+    # API connection settings
+    connection:
+      timeout: 7
+      max_retries: 3
+      retry_delay: 1.0
+    
+    # Order defaults
+    defaults:
+      exchange: "NSE"
+      product: "MIS"           # MIS (intraday), CNC (delivery), NRML (F&O)
+      validity: "DAY"          # DAY or IOC
+    
+    # Note: Kite Connect requires login flow to generate access_token
+    # See: https://kite.trade/docs/connect/v3/user/#login-flow
+  
+  paper:
+    # Paper trading settings
+    initial_capital: 1000000      # ₹10 lakhs starting capital
+    data_broker: "DHAN"           # Broker to fetch live data from
+    
+    # Simulation parameters
+    simulation:
+      commission_pct: 0.03        # 0.03% commission
+      slippage_pct: 0.10          # 0.10% slippage
+      fill_probability: 0.95      # 95% limit order fill rate
+
+# Trading schedule (IST)
+trading_hours:
+  market_open: "09:15"
+  market_close: "15:30"
+  square_off_time: "15:20"        # Close all positions before market close
+  pre_market_start: "09:00"
+  post_market_end: "15:40"
+
+# Logging configuration
+logging:
+  log_all_orders: true            # Log every order to database
+  log_all_fills: true             # Log every fill to database
+  log_market_data: false          # Log market data queries
+  save_to_database: true          # Persist orders to database
+  
+# Order management
+order_management:
+  enable_monitoring: true         # Background order status monitoring
+  monitoring_interval: 5          # Seconds between status checks
+  cache_duration_hours: 24        # Hours to keep orders in cache
+

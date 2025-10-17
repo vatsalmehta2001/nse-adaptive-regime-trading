@@ -47,7 +47,8 @@ xgboost>=2.0.0                   # Alternative gradient boosting
 # =============================================================================
 # TIER 6: Trading Execution
 # =============================================================================
-kiteconnect>=4.0.0               # Zerodha Kite Connect API
+dhanhq==2.0.2                    # DhanHQ broker API (latest)
+kiteconnect==5.0.1               # Zerodha Kite Connect API (latest)
 requests>=2.32.0                 # HTTP library for API calls
 websocket-client>=1.8.0          # WebSocket for real-time data
 

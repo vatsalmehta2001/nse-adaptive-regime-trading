@@ -1,0 +1,74 @@
+# Risk Management Configuration
+
+# Core risk limits
+risk_limits:
+  # Position sizing
+  max_position_size_pct: 10.0         # Max 10% of portfolio per position
+  max_portfolio_exposure: 100.0       # Max 100% capital deployed
+  
+  # Loss limits
+  max_daily_loss_pct: 2.0             # Stop trading at -2% day loss
+  max_trade_value: 50000              # Max ₹50,000 per trade
+  
+  # Capital management
+  min_capital_pct: 10.0               # Keep at least 10% cash
+  max_orders_per_day: 50              # Max 50 orders per day
+  
+  # Circuit breaker configuration
+  circuit_breaker:
+    enabled: true                     # Enable circuit breaker
+    consecutive_losses: 3             # Trigger after 3 consecutive losses
+    cooldown_minutes: 30              # Wait 30 minutes before resuming
+    max_drawdown_pct: 10.0            # Stop at -10% drawdown from peak
+    loss_velocity_threshold: 50000    # Stop if losing ₹50k per hour
+
+# Position limits per symbol
+position_limits:
+  default_max_quantity: 1000          # Default max shares per symbol
+  
+  # Symbol-specific limits (optional)
+  high_liquidity:
+    symbols: ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"]
+    max_quantity: 5000                # Allow larger positions for liquid stocks
+  
+  low_liquidity:
+    symbols: []                       # Add illiquid stocks here
+    max_quantity: 100                 # Restrict illiquid stocks
+
+# Trading restrictions
+restrictions:
+  no_shorting: false                  # Allow short selling (false = allowed)
+  intraday_only: true                 # Only MIS orders, no overnight positions
+  allowed_exchanges: ["NSE", "BSE"]   # Allowed exchanges
+  blocked_symbols: []                 # Symbols not allowed to trade
+
+# Risk alerts
+alerts:
+  # Alert thresholds (for monitoring/notifications)
+  warn_daily_loss_pct: 1.0            # Warn at -1% daily loss
+  warn_position_size_pct: 8.0         # Warn at 8% position size
+  warn_portfolio_exposure: 80.0       # Warn at 80% portfolio exposure
+  warn_consecutive_losses: 2          # Warn after 2 consecutive losses
+
+# Advanced risk management
+advanced:
+  # Position concentration
+  max_sector_exposure_pct: 30.0       # Max 30% in any sector
+  max_correlated_positions: 5         # Max positions in correlated stocks
+  
+  # Volatility-based sizing
+  enable_volatility_scaling: false    # Adjust size based on volatility
+  min_volatility_scaling: 0.5         # Minimum scale factor
+  max_volatility_scaling: 2.0         # Maximum scale factor
+  
+  # Time-based restrictions
+  no_trading_first_minutes: 15        # Skip first 15 min after open
+  no_trading_last_minutes: 10         # Skip last 10 min before close
+  
+# Risk metrics reporting
+reporting:
+  calculate_var: true                 # Calculate Value at Risk
+  var_confidence_level: 0.95          # 95% confidence for VaR
+  calculate_sharpe: true              # Calculate Sharpe ratio
+  risk_free_rate: 0.06                # 6% annual risk-free rate
+

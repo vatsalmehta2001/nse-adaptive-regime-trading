@@ -1,24 +1,27 @@
 """
-Risk Management Module.
+Risk management module for the NSE trading system.
 
-Implements comprehensive risk controls:
-- Position sizing
-- Portfolio VaR calculation
-- Stop loss and take profit management
-- Exposure limits
-- Drawdown monitoring
+This module provides comprehensive risk management capabilities including
+pre-trade risk checks, position limits, loss limits, and circuit breaker
+functionality for emergency stops.
+
+Components:
+    - RiskController: Pre-trade risk validation
+    - CircuitBreaker: Emergency stop mechanism
+
+Example:
+    >>> from src.risk_management import RiskController
+    >>> risk = RiskController()
+    >>> is_valid, reason = risk.validate_order(order, portfolio_value, positions)
+    >>> if not is_valid:
+    ...     print(f"Order rejected: {reason}")
 """
 
-from typing import List
+from src.risk_management.risk_controller import RiskController, RiskLimits
+from src.risk_management.circuit_breaker import CircuitBreaker
 
-__all__: List[str] = [
-    "RiskManager",
-    "PositionSizer",
-    "VaRCalculator",
+__all__ = [
+    "RiskController",
+    "RiskLimits",
+    "CircuitBreaker",
 ]
-
-# Import main classes when they are implemented
-# from src.risk_management.risk_manager import RiskManager
-# from src.risk_management.position_sizer import PositionSizer
-# from src.risk_management.var_calculator import VaRCalculator
-
